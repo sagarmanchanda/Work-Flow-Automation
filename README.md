@@ -1,54 +1,58 @@
-# :package_name
+# Workflow Automation
 
-[![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
 [![Build Status][ico-travis]][link-travis]
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
-[![Total Downloads][ico-downloads]][link-downloads]
 
-**Note:** Replace ```:author_name``` ```:author_username``` ```:author_website``` ```:author_email``` ```:vendor``` ```:package_name``` ```:package_description``` with their correct values in [README.md](README.md), [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSE.md](LICENSE.md) and [composer.json](composer.json) files, then delete this line.
+API for workflow automation. Currently restricted to IITG campus, however can be extended to any work-place by hacking into the login and formbuilder tools.
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
+## Dependencies
+
+All dependencies are listed in the [DEPENDENCIES](DEPENDENCIES.md) file.
 
 ## Install
 
-Via Composer
+Installation recommended via Composer.
+
+To install Composer:
 
 ``` bash
-$ composer require :vendor/:package_name
+$ export HTTP_PROXY=[http proxy]
+$ curl -sS https://getcomposer.org/installer | php
+$ mv composer.phar /usr/local/bin/composer
 ```
+
+``` Note: If the the above fails due to permissions, run the mv line again with sudo. ```
+
+Now open the project directory and run:
+
+``` bash
+$ composer install
+```
+On successfull installation, a *vendors* folder will be generated.
 
 ## Usage
 
-``` php
-$skeleton = new League\Skeleton();
-echo $skeleton->echoPhrase('Hello, League!');
-```
+The directory structure within *src* folder and the namespace structure is linked.
 
+``` php
+$test = new WFA\SkeletonClass();
+echo $test->echoPhrase('Hello world!');
+```
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
 ## Testing
 
-``` bash
-$ composer test
-```
-
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) and [CONDUCT](CONDUCT.md) for details.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## Security
+## Issues
 
-If you discover any security related issues, please email :author_email instead of using the issue tracker.
-
-## Credits
-
-- [:author_name][link-author]
-- [All Contributors][link-contributors]
+All issues are tracked through the GitLab issue tracker.
 
 ## License
 
