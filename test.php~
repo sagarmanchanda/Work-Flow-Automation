@@ -1,0 +1,9 @@
+<?php
+echo "asdfd";
+require 'vendor/autoload.php';
+
+$test = new WFA\SkeletonClass();
+//echo $test->echoPhrase('Hello world!');//1/2123;
+//asd(0);
+//echo "string";
+?>
