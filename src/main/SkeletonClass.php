@@ -1,7 +1,9 @@
 <?php
 
-namespace WFA;
-
+namespace WFA\main;
+function collosus(){
+	echo "function is being called";
+}
 class SkeletonClass
 {
     /**
@@ -10,7 +12,7 @@ class SkeletonClass
      * it is class apart
      */
     public function __construct() {
-
+    	$this->echoPhrase("roger that!");
     }
 
     public function echoPhrase($phrase) {
