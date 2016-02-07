@@ -3,5 +3,11 @@
         "psr-4": {
             "WFA\\": "src"
         }
+    },
+
+    "require-dev": {
+    },
+    "require": {
+        "phpdocumentor/phpdocumentor": "2.*"
     }
 }
