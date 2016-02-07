@@ -58,6 +58,11 @@ All issues are tracked through the GitLab issue tracker.
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
+## Generate Documentation
+```bash
+$ ./phpdoc -d path/src/ -t path/docs/api/
+```
+
 [ico-version]: https://img.shields.io/packagist/v/:vendor/:package_name.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
 [ico-travis]: https://img.shields.io/travis/:vendor/:package_name/master.svg?style=flat-square
