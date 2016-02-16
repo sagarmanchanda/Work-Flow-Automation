@@ -66,6 +66,13 @@ class Login {
 	protected $hash_type;
 
 	/**
+	* Stores an object representing the connection to the MySQL server.
+	*
+	* @var connection_object
+	*/
+	protected $conn;
+
+	/**
 	* Function to set the values of the variables required for the purpose of accessing User-Auth database.
 	*
 	* @param string $db_name
@@ -92,11 +99,10 @@ class Login {
 	* @return connection_object Returns an object representing the connection to the MySQL server.
 	*/
 	public function connectDB() {
-		$conn = mysqli_connect($this->db_hostname, $this->db_username, $this->db_password, $this->db_name);
-		if ($conn->connect_error) {
-			die("Connection Failed: ".$conn->connect_error);
+		$this->conn = mysqli_connect($this->db_hostname, $this->db_username, $this->db_password, $this->db_name);
+		if ($this->conn->connect_error) {
+			die("Connection Failed: ".$this->conn->connect_error);
 		}
-		return $conn;
 	}
 
 	/**
@@ -104,10 +110,14 @@ class Login {
 	*
 	* @param connection_object Object representing the connection to the MySQL server
 	*/
-	public function disconnectDB($conn) {
-		mysqli_close($conn);
+	public function disconnectDB() {
+		mysqli_close($this->conn);
 	}
 
+	protected function login($username, $password) {
+		$this->connectDB();
+		
+	}
 
 }
 
