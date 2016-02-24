@@ -114,10 +114,6 @@ class ConnectDatabase {
 		mysqli_close($this->conn);
 	}
 
-	protected function login($username, $password) {
-		$this->connectDB();
-		
-	}
 
 }
 
