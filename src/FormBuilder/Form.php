@@ -65,8 +65,6 @@ class Form
 			'defaultValue' => $defaultValue
 			);
 		$this->index++;
-
-		// echo "<label>$label</label><input type=\"$inputType\" id=\"$name\" name=\"$name\" value=\"$defaultValue\"><br>";
 	}
 
 	/**
@@ -82,7 +80,7 @@ class Form
 
 		foreach ($this->_inputs as $key => $input) {
 			if ($input['name'] == $name) {
-				$this->_inputs[$key]['rule'] = $rule;
+				$this->_inputs[$key]['rule'][] = $rule;
 			}
 		}
 	}
@@ -110,7 +108,7 @@ class Form
 		}
 
 
-		if (empty($rule) || !in_array($rule, ['required'])) {
+		if (empty($rule) || !in_array($rule, ['required', 'email'])) {
 			die("<b>addRule not used properly. Please specify correct rule for $name.</b><br>");
 		}
 	}
@@ -118,10 +116,21 @@ class Form
 	/**
 	 * Last function called for finally outputting the form.
 	 */
-
 	public function buildForm() {
 		foreach ($this->_inputs as $key => $input) {
-			echo "<label>".$this->_inputs[$key]['label']."</label><input type=\"".$this->_inputs[$key]['inputType']."\" id=\"".$this->_inputs[$key]['name']."\" name=\"".$this->_inputs[$key]['name']."\" value=\"".$this->_inputs[$key]['defaultValue']."\"><br>";
+			// Check if email validation is required.
+			if (isset($input['rule']) && in_array('email', $input['rule'])) {
+				$input['inputType'] = 'email';
+			}
+
+			echo "<label>".$input['label']."</label><input type=\"".$input['inputType']."\" id=\"".$input['name']."\" name=\"".$input['name']."\" value=\"".$input['defaultValue']."\"";
+
+			// Check if field was required.
+			if (isset($input['rule']) && in_array('required', $input['rule'])) {
+				echo " required";
+			}
+
+			echo "><br>";
 		}
 	}
 }
