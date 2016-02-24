@@ -91,6 +91,8 @@ class ConnectDatabase {
 		$this->user_column = $user_column;
 		$this->pass_column = $pass_column;
 		$this->hash_type = $hash_type;
+		$this->connectDB();
+		$Log = new \WFA\Auth\Login($this->conn, $this->table_name);
 	}
 
 	/**
