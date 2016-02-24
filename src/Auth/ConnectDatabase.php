@@ -3,7 +3,7 @@
 namespace WFA\Auth;
 
 /**
-* This class handles the User-Authentication.
+* This class handles the Connection of Database for User-Authentication.
 */
 class ConnectDatabase {
 
@@ -73,7 +73,8 @@ class ConnectDatabase {
 	protected $conn;
 
 	/**
-	* Function to set the values of the variables required for the purpose of accessing User-Auth database.
+	* Function to set the values of the variables required for the purpose of accessing User-Auth database
+	* and further setup the login page.
 	*
 	* @param string $db_name
 	* 
@@ -97,8 +98,6 @@ class ConnectDatabase {
 
 	/**
 	* Function to connect to the database.
-	*
-	* @return connection_object Returns an object representing the connection to the MySQL server.
 	*/
 	public function connectDB() {
 		$this->conn = mysqli_connect($this->db_hostname, $this->db_username, $this->db_password, $this->db_name);
@@ -109,17 +108,11 @@ class ConnectDatabase {
 
 	/**
 	* Function to disconnect from the database.
-	*
-	* @param connection_object Object representing the connection to the MySQL server
 	*/
 	public function disconnectDB() {
 		mysqli_close($this->conn);
 	}
 
-	protected function login($username, $password) {
-		$this->connectDB();
-		
-	}
 
 }
 
