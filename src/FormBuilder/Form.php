@@ -58,7 +58,12 @@ class Form
 			die("Input type is not correct for field \"$name\". Please check your usage of addElement function.");
 		}
 
-		$this->_inputs[$this->index] = array('inputType' => $inputType, 'name' => $name, 'label' => $label, 'defaultValue' => $defaultValue);
+		$this->_inputs[$this->index] = array(
+			'inputType' => $inputType,
+			'name' => $name,
+			'label' => $label,
+			'defaultValue' => $defaultValue
+			);
 		$this->index++;
 
 		// echo "<label>$label</label><input type=\"$inputType\" id=\"$name\" name=\"$name\" value=\"$defaultValue\"><br>";
@@ -109,5 +114,14 @@ class Form
 			die("<b>addRule not used properly. Please specify correct rule for $name.</b><br>");
 		}
 	}
+
+	/**
+	 * Last function called for finally outputting the form.
+	 */
+
+	public function buildForm() {
+		foreach ($this->_inputs as $key => $input) {
+			echo "<label>".$this->_inputs[$key]['label']."</label><input type=\"".$this->_inputs[$key]['inputType']."\" id=\"".$this->_inputs[$key]['name']."\" name=\"".$this->_inputs[$key]['name']."\" value=\"".$this->_inputs[$key]['defaultValue']."\"><br>";
+		}
+	}
 }
-?>
