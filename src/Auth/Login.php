@@ -15,7 +15,7 @@ class Login {
 	* @param string $table_name
 	*/
 	function __construct($conn, $table_name) {
-		$this->CreateLoginForm("POST","loginscript.php");
+		$this->CreateLoginForm("POST","src/Auth/loginscript.php");
 	}
 
 	/**
@@ -27,7 +27,7 @@ class Login {
 	* @param string $formAction
 	*/
 	protected function CreateLoginForm($formMethod, $formAction){
-
+		
 		echo 
 		"<!DOCTYPE html>
 		 <html>
