@@ -7,10 +7,6 @@
 
 API for workflow automation. Currently restricted to IITG campus, however can be extended to any work-place by hacking into the login and formbuilder tools.
 
-# Dependencies
-
-All dependencies are listed in the [DEPENDENCIES](DEPENDENCIES.md) file.
-
 # Install
 
 Installation recommended via Composer.
@@ -64,6 +60,11 @@ Now you may proceed to add a new form, for example:
 ``` php
 $newform = new WFA\FormBuilder\Form();
 ```
+
+# Dependencies
+
+All dependencies are listed in the [DEPENDENCIES](DEPENDENCIES.md) file.
+
 # Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
