@@ -1,13 +1,14 @@
 # Changelog
 
-All Notable changes to `:package_name` will be documented in this file.
+All Notable changes to `Workflow Automation` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
-## NEXT - YYYY-MM-DD
+## NEXT - 2016-02-26
 
 ### Added
-- Nothing
+- Auth Module
+- FormBuilder Module
 
 ### Deprecated
 - Nothing

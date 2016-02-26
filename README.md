@@ -5,7 +5,7 @@
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
 
-API for workflow automation. Currently restricted to IITG campus, however can be extended to any work-place by hacking into the login and formbuilder tools.
+API for workflow automation. Currently restricted to IIT Guwahati campus, however can be extended to any work-place by hacking into the authentication and formbuilder tools.
 
 # Install
 
@@ -58,7 +58,21 @@ $form->buildForm();
 
 Now you may proceed to add a new form, for example:
 ``` php
-$newform = new WFA\FormBuilder\Form();
+$form2 = new WFA\FormBuilder\Form();
+```
+
+# Generate Documentation (For Developers)
+Add `phpdoc` path to your environment variables:
+
+```bash
+$ cd vendor/phpdocumentor/phpdocumentor/bin
+$ export PATH=$PWD:$PATH
+```
+
+Then go back to the root of the software and execute the following:
+
+```bash
+$ phpdoc -d src/ -t docs/
 ```
 
 # Dependencies
@@ -84,11 +98,6 @@ All issues are tracked through the GitLab issue tracker.
 # License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-## Generate Documentation
-```bash
-$ ./phpdoc -d path/src/ -t path/docs/api/
-```
 
 [ico-version]: https://img.shields.io/packagist/v/:vendor/:package_name.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
