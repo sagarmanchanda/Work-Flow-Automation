@@ -41,5 +41,4 @@ Go to the *Merge Requests* section in GitLab and create a new merge request for 
 $ composer test
 ```
 
-
 **Happy coding**!
