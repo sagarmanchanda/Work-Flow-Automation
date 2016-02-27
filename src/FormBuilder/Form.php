@@ -162,7 +162,7 @@ class Form
 				echo " required";
 			}
 
-			echo "><br>";
+			echo "><br></form>";
 		}
 	}
 }
