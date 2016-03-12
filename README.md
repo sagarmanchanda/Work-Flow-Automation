@@ -85,7 +85,12 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 
 # Testing
 
-Testing will be done using PHPUnit and CI bot Jenkins. (Not implemented right now.)
+Testing is done through PHPUnit. All test suites are stored in the 'tests' folder. All tests for a class 'Class' are named as 'ClassTest'.
+To run tests for a class say 'ExampleClass', use the following:
+
+```bash
+$ phpunit --bootstrap vendor/autoload.php tests/ExampleClassTest
+```
 
 # Contributing
 
