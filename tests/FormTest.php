@@ -1,5 +1,5 @@
 <?php
-//require '../vendor/autoload.php';
+
 class FormTest extends PHPUnit_Framework_TestCase {
 	public function testExportInput() {
 		$form = new WFA\FormBuilder\Form();
