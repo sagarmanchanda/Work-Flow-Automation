@@ -114,6 +114,23 @@ class Form
 	}
 
 	/**
+	 * In case we need to export input to any other part of the api.
+	 *
+	 * @param $name
+	 *  Name of the input to be exported.
+	 */
+
+	public function exportInput($name) {
+		foreach ($this->_inputs as $key => $input) {
+			if ($input['name'] == $name) {
+				$export = array();
+				$export = \WFA\Utils::copyValues($input);
+			}
+		}
+		return $export;
+	}
+
+	/**
 	 * Last function called for finally outputting the form.
 	 */
 	public function buildForm() {
