@@ -5,7 +5,8 @@
         }
     },
 
-    "require": {
-        "phpdocumentor/phpdocumentor": "2.*"
+    "require-dev": {
+        "phpdocumentor/phpdocumentor": "2.*",
+	"phpunit/phpunit": "5.0.*"
     }
 }

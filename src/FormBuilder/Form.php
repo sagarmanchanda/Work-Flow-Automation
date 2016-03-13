@@ -7,6 +7,19 @@ namespace WFA\FormBuilder;
 */
 class Form
 {
+	/**
+	 * Form submit method.
+	 *
+	 * @var string
+	 */	
+	protected $method;
+
+	/**
+	 * Title of the form.
+	 *
+	 * @var string
+	 */
+	protected $title;
 
 	/**
 	 * The array containing all inputs.
@@ -33,13 +46,8 @@ class Form
 	 */
 	function __construct($method = 'POST', $title = 'WFA Form')
 	{
-		echo "<!DOCTYPE html>
-		<html>
-		<head>
-			<title>$title</title>
-		</head>
-		<body>
-		<form method=\"$method\">";
+		$this->title = $title;
+		$this->method = $method;
 	}
 
 	/**
@@ -114,9 +122,33 @@ class Form
 	}
 
 	/**
+	 * In case we need to export input to any other part of the api.
+	 *
+	 * @param $name
+	 *  Name of the input to be exported.
+	 */
+
+	public function exportInput($name) {
+		foreach ($this->_inputs as $key => $input) {
+			if ($input['name'] == $name) {
+				$export = array();
+				$export = \WFA\Utils::copyValues($input);
+			}
+		}
+		return $export;
+	}
+
+	/**
 	 * Last function called for finally outputting the form.
 	 */
 	public function buildForm() {
+		echo "<!DOCTYPE html>
+		<html>
+		<head>
+			<title>$this->title</title>
+		</head>
+		<body>
+		<form method=\"$this->method\">";
 		foreach ($this->_inputs as $key => $input) {
 			// Check if email validation is required.
 			if (isset($input['rule']) && in_array('email', $input['rule'])) {
