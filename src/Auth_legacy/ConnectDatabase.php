@@ -1,6 +1,6 @@
 <?php
 
-namespace WFA\Auth;
+namespace WFA\Auth_legacy;
 
 /**
 * This class handles the Connection of Database for User-Authentication.
