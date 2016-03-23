@@ -165,4 +165,25 @@ class Form
 			echo "><br>";
 		}
 	}
+
+	public function buildForm_html() {
+		$formTemplate = fopen("src/Templates/formTemplate.php", "w") or die("Unable to create form template!");
+		$formHtml = "<!DOCTYPE html>
+		<html>
+		<head>
+			<title>".$this->title."</title>
+		</head>
+		<body>
+		<form method=\"".$this->method."\">";
+		
+		//Add the form elements by running a loop on $_input. 
+		$formHtml .= "<h1> This Works! </h1>
+		</form>
+		</body>
+		</html>";
+
+		fwrite($formTemplate, $formHtml);
+		fclose($formTemplate);
+	}
+
 }
