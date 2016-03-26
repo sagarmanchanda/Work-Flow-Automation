@@ -166,6 +166,9 @@ class Form
 		}
 	}
 
+	/**
+	 * Last function called for finally outputting the form as html into Template folder.
+	 */
 	public function buildForm_html() {
 		$formTemplate = fopen("src/Templates/formTemplate.php", "w") or die("Unable to create form template!");
 		$formHtml = "<!DOCTYPE html>
@@ -175,10 +178,24 @@ class Form
 		</head>
 		<body>
 		<form method=\"".$this->method."\">";
-		
-		//Add the form elements by running a loop on $_input. 
-		$formHtml .= "<h1> This Works! </h1>
-		</form>
+
+		foreach ($this->_inputs as $key => $input) {
+			// Check if email validation is required.
+			if (isset($input['rule']) && in_array('email', $input['rule'])) {
+				$input['inputType'] = 'email';
+			}
+
+			$formHtml .= "<label>".$input['label']."</label><input type=\"".$input['inputType']."\" id=\"".$input['name']."\" name=\"".$input['name']."\" value=\"".$input['defaultValue']."\"";
+
+			// Check if field was required.
+			if (isset($input['rule']) && in_array('required', $input['rule'])) {
+				$formHtml .= " required";
+			}
+
+			$formHtml .= "><br>";
+		}
+
+		$formHtml .= "</form>
 		</body>
 		</html>";
 
