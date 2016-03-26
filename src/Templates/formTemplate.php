@@ -4,7 +4,6 @@
 			<title>WFA Form</title>
 		</head>
 		<body>
-		<form method="POST"><h1> This Works! </h1>
-		</form>
+		<form method="POST"><label>complaint</label><input type="text" id="complaint" name="complaint" value="yo manas"><br></form>
 		</body>
 		</html>
