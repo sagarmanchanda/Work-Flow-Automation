@@ -203,4 +203,59 @@ class Form
 		fclose($formTemplate);
 	}
 
+	/**
+	 * function called to create a database with table for request handling. 
+	 */
+	public function buildDatabase($db_name = "requestDB", $table_name = "requestHandling") {
+		$hostname = "localhost";
+		$db_username = "root";
+		$db_password = "";
+		$conn = new \mysqli($hostname, $db_username, $db_password);
+		if ($conn->connect_error) {
+			die("Connection failed: ".$conn->connect_error);
+		}
+
+		// Creating Database
+		$sql = "CREATE DATABASE ".$db_name;
+		if ($conn->query($sql) === TRUE) {
+			$conn->close();
+		}
+		else {
+			die("Unable to create database ".$conn->error);
+		}
+
+		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
+		if ($conn->connect_error) {
+			die("Connection failed: ".$conn->connect_error);
+		}
+
+		// Create Table 
+		$sql = "CREATE TABLE ".$table_name."(
+		requestID VARCHAR(32) PRIMARY KEY,
+		username VARCHAR(50) NOT NULL,
+		requestDate TIMESTAMP, ";
+		foreach($this->_inputs as $key => $input) {
+			if ($input['inputType'] == "submit") {
+				continue;
+			}
+			else if ($input['inputType'] == "text") {
+				$inputType_mysql = " VARCHAR(1000)";
+			}
+			else if ($input['inputType'] == "radio") {
+				$inputType_mysql = " BOOL";
+			}
+			$sql .= $input['label'].$inputType_mysql.", ";
+		}
+		$sql .= "requestStatus INT(2) NOT NULL
+		)";
+
+		if ($conn->query($sql) === TRUE) {
+			$conn->close();
+		}
+		else {
+			die("Unable to create Table ".$conn->error);
+		}
+
+	}
+
 }
