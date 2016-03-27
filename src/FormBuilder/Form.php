@@ -295,6 +295,9 @@ class Form
 		}
 
 		foreach($this->_inputs as $key => $input) {
+			if ($input['inputType'] == "submit"){
+				continue;
+			}
 			$sql = "INSERT INTO ".$table_name."(inputType, name, label, defaultValue) 
 			VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
 			if ($conn->query($sql) === FALSE){
