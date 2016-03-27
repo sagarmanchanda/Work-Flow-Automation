@@ -231,7 +231,7 @@ class Form
 
 		// Create Table 
 		$sql = "CREATE TABLE ".$table_name."(
-		requestID VARCHAR(32) PRIMARY KEY,
+		requestID VARCHAR(34) PRIMARY KEY,
 		username VARCHAR(50) NOT NULL,
 		requestDate TIMESTAMP, ";
 		foreach($this->_inputs as $key => $input) {
