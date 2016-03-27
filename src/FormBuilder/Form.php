@@ -177,7 +177,7 @@ class Form
 			<title>".$this->title."</title>
 		</head>
 		<body>
-		<form method=\"".$this->method."\">";
+		<form method=\"".$this->method."\" action=\"../FormBuilder/submitRequest.php\" >";
 
 		foreach ($this->_inputs as $key => $input) {
 			// Check if email validation is required.
@@ -231,7 +231,7 @@ class Form
 
 		// Create Table 
 		$sql = "CREATE TABLE ".$table_name."(
-		requestID VARCHAR(32) PRIMARY KEY,
+		requestID VARCHAR(36) PRIMARY KEY,
 		username VARCHAR(50) NOT NULL,
 		requestDate TIMESTAMP, ";
 		foreach($this->_inputs as $key => $input) {
@@ -244,7 +244,7 @@ class Form
 			else if ($input['inputType'] == "radio") {
 				$inputType_mysql = " BOOL";
 			}
-			$sql .= $input['label'].$inputType_mysql.", ";
+			$sql .= $input['name'].$inputType_mysql.", ";
 		}
 		$sql .= "requestStatus INT(2) NOT NULL
 		)";
@@ -255,6 +255,56 @@ class Form
 		else {
 			die("Unable to create Table ".$conn->error);
 		}
+
+	}
+
+	/**
+	 * function called to create a table which stores the $_inputs array which is
+	 * used later for the pupose of form-handling.
+	 * helps to save the state of $_inputs to database.
+	 *
+	 */
+	public function buildFormEntriesTable($db_name = "requestDB", $table_name = "FormEntries") {
+		$hostname = "localhost";
+		$db_username = "root";
+		$db_password = "";
+		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
+		if ($conn->connect_error) {
+			die("Connection failed: ".$conn->connect_error);
+		}
+
+		// Create table
+		$sql = "CREATE TABLE ".$table_name."(
+		inputType VARCHAR(50) NOT NULL,
+		name VARCHAR(50) NOT NULL,
+		label VARCHAR(50),
+		defaultValue VARCHAR(50)
+		)";
+
+		if ($conn->query($sql) === TRUE) {
+			$conn->close();
+		}
+		else {
+			die("Unable to create Table ".$conn->error);
+		}
+
+		// Add Records to the above created Table
+		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
+		if ($conn->connect_error) {
+			die("Connection failed: ".$conn->connect_error);
+		}
+
+		foreach($this->_inputs as $key => $input) {
+			if ($input['inputType'] == "submit"){
+				continue;
+			}
+			$sql = "INSERT INTO ".$table_name."(inputType, name, label, defaultValue) 
+			VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
+			if ($conn->query($sql) === FALSE){
+				die("Unable to add entries to FormEntries table ".$conn->error);
+			}
+		}
+		$conn->close();
 
 	}
 
