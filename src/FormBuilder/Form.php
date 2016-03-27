@@ -177,7 +177,7 @@ class Form
 			<title>".$this->title."</title>
 		</head>
 		<body>
-		<form method=\"".$this->method."\">";
+		<form method=\"".$this->method."\" action=\"../FormBuilder/submitRequest.php\" >";
 
 		foreach ($this->_inputs as $key => $input) {
 			// Check if email validation is required.
@@ -244,7 +244,7 @@ class Form
 			else if ($input['inputType'] == "radio") {
 				$inputType_mysql = " BOOL";
 			}
-			$sql .= $input['label'].$inputType_mysql.", ";
+			$sql .= $input['name'].$inputType_mysql.", ";
 		}
 		$sql .= "requestStatus INT(2) NOT NULL
 		)";
