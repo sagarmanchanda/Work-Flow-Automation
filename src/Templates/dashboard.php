@@ -13,9 +13,10 @@
 	<h1> Welcome 
 	<?php 
 		echo $_SESSION['user_name'];
-		#session_destroy(); 
 	?>
 	</h1>
+	<br>
+	<h2><a href="../Auth/logout.php">Logout</a></h2>
 	<iframe src="formTemplate.php"></iframe>
 </body>
 </html>

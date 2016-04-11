@@ -4,7 +4,6 @@ if ( session_id() == "" ){
 	session_start();
 }
 
-$message="";
 
 if(count($_POST)>0) {
 	$conn = mysqli_connect($_SESSION["host_name"],$_SESSION["db_username"],$_SESSION["db_password"],$_SESSION["db_name"]);
@@ -19,8 +18,8 @@ if(count($_POST)>0) {
 		$_SESSION["user_name"] = $row['username'];
 	} 
 	else {
-		$message = "Invalid Username or Password!";
-		echo $message;
+			header("Location:../Templates/login_failure.php");
+
 	}
 }
 
