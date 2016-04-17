@@ -51,7 +51,7 @@ class FiniteAutomata
 	 * Helps to create and add new states.
 	 *
 	 * @param string $stateName
-	 *	Name of the sate.
+	 *	Name of the state.
 	 *
 	 * @param int $stateID
 	 *	ID of the state which will appear in RequestStatus.
@@ -72,7 +72,7 @@ class FiniteAutomata
 	 * Checks if the given addition of state is valid or not.
 	 *
 	 * @param string $stateName
-	 *	Name of the sate.
+	 *	Name of the state.
 	 *
 	 * @param int $stateID
 	 *	ID of the state which will appear in RequestStatus.
@@ -168,7 +168,72 @@ class FiniteAutomata
 
 	}
 
+	public function saveToDatabase($databaseName = "requestDB", $stateTableName = "AutomataStates", $transitionTableName = "AutomataTransitions") {
+		// Takes credentials from config.php and connects to DB.
+		$config = include('config.php');
+		$databaseHostname = $config['databaseHostname'];
+		$databaseUsername = $config['databaseUsername'];
+		$databasePassword = $config['databasePassword'];
+		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword);
+		if ($conn->connect_error) {
+			die("Connection Error:".$conn->connect_error);
+		}
+		// Connects to DB, create if does not exist.
+		$sql = "CREATE DATABASE IF NOT EXISTS ".$databaseName;
+		if ($conn->query($sql) === TRUE) {
+			$conn->close();
+		}
 
+		// Creates a table for states and saves the content.
+		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
+		if ($conn->connect_error) {
+			die("Connection Error: ".$conn->connect_error);
+		}
+
+		$sql = "CREATE TABLE IF NOT EXISTS ".$stateTableName." (
+		stateName VARCHAR(50) NOT NULL,
+		stateID INT(5) PRIMARY KEY 
+		)";
+		if ($conn->query($sql) === TRUE) {
+			// Empty the table, to override the contents.
+			$sql = "TRUNCATE TABLE ".$stateTableName;
+			$conn->query($sql);
+			foreach ($this->_states as $key => $state) {
+				$sql = "INSERT INTO ".$stateTableName."(stateName, stateID) VALUES (\"".$state['stateName']."\", \"".$state['stateID']."\")";
+				if ($conn->query($sql) === FALSE) {
+					die("Unable to add entries to table ".$stateTableName);
+				}
+			}
+		}
+		else {
+			die("Table ".$stateTableName." Creation Error:".$conn->error);
+		}
+
+		// Create a table for transitions and add contents.
+		$sql = "CREATE TABLE IF NOT EXISTS ".$transitionTableName." (
+		transitionID INT(5) PRIMARY KEY,
+		transitionName VARCHAR(50) NOT NULL,
+		presentState VARCHAR(50) NOT NULL,
+		nextState VARCHAR(50) NOT NULL,
+		response VARCHAR(50) NOT NULL 
+		)";
+		if ($conn->query($sql) === TRUE) {
+			// Empty the table, to override the contents.
+			$sql = "TRUNCATE TABLE ".$transitionTableName;
+			$conn->query($sql);
+			foreach ($this->_transitions as $key => $transition) {
+				$sql = "INSERT INTO ".$transitionTableName."(transitionID, transitionName, presentState, nextState, response) VALUES (\"".$key."\", \"".$transition['transitionName']."\", \"".$transition['presentState']."\", \"".$transition['nextState']."\", \"".$transition['response']."\")";
+				if ($conn->query($sql) === FALSE) {
+					die("Unable to add entries to table ".$transitionTableName);
+				}
+			}
+		}
+		else {
+			die("Table ".$transitionTableName." Creation Error:".$conn->error);
+		}
+
+
+	}
 
 }
 
