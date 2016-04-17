@@ -24,7 +24,7 @@ class FiniteAutomata
 	protected $stateIndex;
 
 	/**
-	 * Number of states in Automata. Please make sure to add the FINISHED/COMPLETED state.
+	 * Number of transitions in Automata.
 	 *
 	 * @var int
 	 */		
