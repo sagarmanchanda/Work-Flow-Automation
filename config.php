@@ -5,7 +5,7 @@
 	*
 	* @var string
 	*/
-	global $db_hostname_config = 'localhost';
+	$databaseHostname = 'localhost';
 
 	/**
 	* It stores the username required to connect to MySQL. The coder is expected to changes
@@ -13,7 +13,7 @@
 	*
 	* @var string
 	*/
-	global $db_username_config = 'root';
+	$databaseUsername = 'root';
 
 	/**
 	* It stores the password required to connect to MySQL. The coder is expected to changes
@@ -21,6 +21,12 @@
 	*
 	* @var string
 	*/
-	global $db_password_config = '';
+	$databasePassword = '';
+
+	return array(
+		'databaseHostname' => $databaseHostname,
+		'databaseUsername' => $databaseUsername,
+		'databasePassword' => $databasePassword
+	);
 
 ?>
