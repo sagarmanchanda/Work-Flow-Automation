@@ -168,6 +168,20 @@ class FiniteAutomata
 
 	}
 
+	/**
+	 * Saves the structure of the Automata in the database for future reference by creating tables for storing
+	 * states and transitions.
+	 *
+	 * @param string $databaseName
+	 *	The databse created by API is assumed to be named RequestDB throughout.
+	 *
+	 * @param string $stateTableName
+	 *  The table created is named AutomataStates by default.
+	 *	
+	 * @param string $transitionTableName
+	 *	The table created is named AutomataTransitions by default.
+	 *
+	 */
 	public function saveToDatabase($databaseName = "requestDB", $stateTableName = "AutomataStates", $transitionTableName = "AutomataTransitions") {
 		// Takes credentials from config.php and connects to DB.
 		$config = include('config.php');
