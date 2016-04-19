@@ -246,7 +246,7 @@ class FiniteAutomata
 			die("Table ".$transitionTableName." Creation Error:".$conn->error);
 		}
 
-
+		$conn->close();
 	}
 
 }

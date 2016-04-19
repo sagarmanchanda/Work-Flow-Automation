@@ -26,7 +26,7 @@ class Form
 	 *
 	 * @var array
 	 */
-	protected $_inputs;
+	protected $_inputs=[];
 
 	/**
 	 * Index of the inputs.
@@ -34,6 +34,21 @@ class Form
 	 * @var int
 	 */
 	protected $index = 0;
+
+	/**
+	 * State name for which form would be defined.
+	 *
+	 * @var string
+	 */
+	protected $stateName;
+
+	/**
+	 * State ID for which form would be defined.
+	 *
+	 * @var string
+	 */
+	protected $stateID;
+
 	
 	/**
 	 * Contructor function, initializes the form.
@@ -44,10 +59,12 @@ class Form
 	 * @param string $title
 	 *	The title of the web-form.
 	 */
-	function __construct($method = 'POST', $title = 'WFA Form')
-	{
-		$this->title = $title;
+	function __construct($stateName, $stateID, $method = 'POST')
+	{	
+		$this->stateName = $stateName;
+		$this->stateID = $stateID;
 		$this->method = $method;
+		$this->title = $stateName." Form";
 	}
 
 	/**
@@ -73,6 +90,85 @@ class Form
 			'defaultValue' => $defaultValue
 			);
 		$this->index++;
+	}
+
+	/**
+	 * Function to add elements from database to act as identifiers. 'label' contains $columnName and 'defaultValue' contains 
+	 * $elementType.
+	 *
+	 * @param string $name
+	 * 
+	 * @param string $columnName
+	 *	column name corresponding to it in the database. 
+	 *
+	 * @param string $elementType
+	 *	Variable type as in int, text, etc.
+	 */
+	public function addDatabaseElement($name, $columnName, $elementType) {
+		$error = $this->validateAddDatabaseElement($name, $columnName, $elementType);
+		if (!empty($error)) {
+			die($error);
+		}
+		$this->_inputs[$this->index] = array(
+			'inputType' => "DATABASE",
+			'name' => $name,
+			'label' => $columnName,
+			'defaultValue' => $elementType
+			);
+		$this->index++;
+	}
+
+	/**
+	 * Function to validate the addition of Database elements to act as identifiers. 
+	 *
+	 * @param string $name
+	 * 
+	 * @param string $columnName
+	 *	column name corresponding to it in the database. 
+	 *
+	 * @param string $elementType
+	 *	Variable type as in int, text, etc.
+	 */
+	private function validateAddDatabaseElement($name, $columnName, $elementType) {
+		$config = include('config.php');
+		$loginDatabaseHostname = $config['loginDatabaseHostname'];
+		$loginDatabaseUsername = $config['loginDatabaseUsername'];
+		$loginDatabasePassword = $config['loginDatabasePassword'];
+		$loginDatabaseName = $config['loginDatabaseName'];
+		$loginTableName = $config['loginTableName'];
+		
+		$conn = new \mysqli($loginDatabaseHostname, $loginDatabaseUsername, $loginDatabasePassword, $loginDatabaseName);
+		if ($conn->connect_error) {
+			die("Connection Error:".$conn->connect_error);
+		}
+
+		$sql = "SHOW COLUMNS FROM ".$loginTableName or die("Unable to fetch column names from login table.");
+		$result = $conn->query($sql);
+		$index = 0;
+		$columns = [];
+		while ($row = \mysqli_fetch_assoc($result)) {
+			$columns[$index] = $row['Field'];
+			$index++;
+		}
+		// Checks if the given columnName is indeed present in the table.
+		$isValidColumnName = FALSE;
+		foreach ($columns as $column) {
+			if ($column == $columnName) {
+				$isValidColumnName = TRUE;
+			}
+		}
+		if (!$isValidColumnName) {
+			return "Such a column \"".$columnName."\" does not exist in login table.";
+		}
+		// Takes care of repetition.
+		foreach ($this->_inputs as $key => $input) {
+			if ($input['name'] == $name) {
+				return "\"".$name."\" name is already in use. Please use some other name for the element.";
+			}
+			if ($input['label'] == $columnName) {
+				return "You have already included \"".$columnName."\". You cannot do it again.";
+			}
+		}
 	}
 
 	/**
@@ -139,7 +235,116 @@ class Form
 	}
 
 	/**
-	 * Last function called for finally outputting the form.
+	 * Creates html equivalent/template of the form described for a particular state. This function should be called at the end
+	 * once all the form entries are decided. The template is created in the Templates folder under src.
+	 *
+	 */
+	public function buildFormTemplate() {
+		$formTemplatepath = "src/Templates/".$this->stateName.".php";
+		$formTemplate = fopen($formTemplatepath, "w") or die ("Unable to create html template for \"".$this->stateName."\" state.");
+		$formHtml = "<!DOCTYPE html>
+		<html>
+		<head>
+			<title>".$this->title."</title>
+		</head>
+		<body>
+		<form method=\"".$this->method."\" action=\"../FormBuilder/submitRequest.php\" >";
+
+		foreach ($this->_inputs as $key => $input) {
+			// Skip the Database elements.
+			if ($input['inputType'] == "DATABASE") {
+				continue;
+			}
+			// Check if email validation is required.
+			if (isset($input['rule']) && in_array('email', $input['rule'])) {
+				$input['inputType'] = 'email';
+			}
+
+			$formHtml .= "<label>".$input['label']."</label><input type=\"".$input['inputType']."\" id=\"".$input['name']."\" name=\"".$input['name']."\" value=\"".$input['defaultValue']."\"";
+
+			// Check if field was required.
+			if (isset($input['rule']) && in_array('required', $input['rule'])) {
+				$formHtml .= " required";
+			}
+			// Makes the html page more readable, i.e. appending with a new line.
+			$formHtml .= ">
+			<br>";
+		}
+
+		$formHtml .= "</form>
+		</body>
+		</html>";
+
+		fwrite($formTemplate, $formHtml);
+		fclose($formTemplate);
+	}
+
+	
+	/**
+	 * function called to create a table which stores the contents of $_inputs array for a particular state in the requestDB
+	 * database in the table which is names after the state. This table would be later used for the pupose of deciding response
+	 * for a particular input from page and then further deciding the transition.
+	 *	
+	 * @param $databaseName
+	 * 	Alwways use the default set value of the parameter, i.e. "RequestDB".
+	 */
+	public function buildFormInputFieldTable($databaseName = "requestDB") {
+		// take credentials from config.php and connect to database.
+		$config = include('config.php');
+		$databaseHostname = $config['databaseHostname'];
+		$databaseUsername = $config['databaseUsername'];
+		$databasePassword = $config['databasePassword'];
+		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword);
+		if ($conn->connect_error) {
+			die("Connection Error:".$conn->connect_error);
+		}
+		// Connects to DB, create if does not exist.
+		$sql = "CREATE DATABASE IF NOT EXISTS ".$databaseName;
+		if ($conn->query($sql) === TRUE) {
+			$conn->close();
+		}
+
+		// Creates a table with name as stateName for state's form input fields and saves the content.
+		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
+		if ($conn->connect_error) {
+			die("Connection Error: ".$conn->connect_error);
+		}
+
+		$sql = "CREATE TABLE IF NOT EXISTS ".$this->stateName."(
+		inputType VARCHAR(50) NOT NULL,
+		name VARCHAR(50) NOT NULL,
+		label VARCHAR(50),
+		defaultValue VARCHAR(50)
+		)";
+		if ($conn->query($sql) === TRUE) {
+			// Empty the table, to override the contents.
+			$sql = "TRUNCATE TABLE ".$this->stateName;
+			$conn->query($sql);
+			foreach($this->_inputs as $key => $input) {
+			// Skip the submit buttons
+				if ($input['inputType'] == "submit") {
+					continue;
+				}
+				$sql = "INSERT INTO ".$this->stateName." (inputType, name, label, defaultValue) 
+				VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
+				if ($conn->query($sql) === FALSE) {
+					die("Unable to add entries to FormEntries table ".$conn->error);
+				}
+		}
+		}
+		else {
+			die("Unable to create Table for state \"".$this->stateName."\": ".$conn->error);			
+		}
+
+		
+		$conn->close();
+
+	}
+
+	/**
+	 * Last function called for finally outputting the form.]
+	 * 
+	 * @deprecated
 	 */
 	public function buildForm() {
 		echo "<!DOCTYPE html>
@@ -164,148 +369,6 @@ class Form
 
 			echo "><br></form>";
 		}
-	}
-
-	/**
-	 * Last function called for finally outputting the form as html into Template folder.
-	 */
-	public function buildForm_html() {
-		$formTemplate = fopen("src/Templates/formTemplate.php", "w") or die("Unable to create form template!");
-		$formHtml = "<!DOCTYPE html>
-		<html>
-		<head>
-			<title>".$this->title."</title>
-		</head>
-		<body>
-		<form method=\"".$this->method."\" action=\"../FormBuilder/submitRequest.php\" >";
-
-		foreach ($this->_inputs as $key => $input) {
-			// Check if email validation is required.
-			if (isset($input['rule']) && in_array('email', $input['rule'])) {
-				$input['inputType'] = 'email';
-			}
-
-			$formHtml .= "<label>".$input['label']."</label><input type=\"".$input['inputType']."\" id=\"".$input['name']."\" name=\"".$input['name']."\" value=\"".$input['defaultValue']."\"";
-
-			// Check if field was required.
-			if (isset($input['rule']) && in_array('required', $input['rule'])) {
-				$formHtml .= " required";
-			}
-
-			$formHtml .= "><br>";
-		}
-
-		$formHtml .= "</form>
-		</body>
-		</html>";
-
-		fwrite($formTemplate, $formHtml);
-		fclose($formTemplate);
-	}
-
-	/**
-	 * function called to create a database with table for request handling. 
-	 */
-	public function buildDatabase($db_name = "requestDB", $table_name = "requestHandling") {
-		$hostname = "localhost";
-		$db_username = "root";
-		$db_password = "";
-		$conn = new \mysqli($hostname, $db_username, $db_password);
-		if ($conn->connect_error) {
-			die("Connection failed: ".$conn->connect_error);
-		}
-
-		// Creating Database
-		$sql = "CREATE DATABASE ".$db_name;
-		if ($conn->query($sql) === TRUE) {
-			$conn->close();
-		}
-		else {
-			die("Unable to create database :".$conn->error);
-		}
-
-		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
-		if ($conn->connect_error) {
-			die("Connection failed: ".$conn->connect_error);
-		}
-
-		// Create Table 
-		$sql = "CREATE TABLE ".$table_name."(
-		requestID VARCHAR(36) PRIMARY KEY,
-		username VARCHAR(50) NOT NULL,
-		requestDate TIMESTAMP, ";
-		foreach($this->_inputs as $key => $input) {
-			if ($input['inputType'] == "submit") {
-				continue;
-			}
-			else if ($input['inputType'] == "text") {
-				$inputType_mysql = " VARCHAR(1000)";
-			}
-			else if ($input['inputType'] == "radio") {
-				$inputType_mysql = " BOOL";
-			}
-			$sql .= $input['name'].$inputType_mysql.", ";
-		}
-		$sql .= "requestStatus INT(2) NOT NULL
-		)";
-
-		if ($conn->query($sql) === TRUE) {
-			$conn->close();
-		}
-		else {
-			die("Unable to create Table ".$conn->error);
-		}
-
-	}
-
-	/**
-	 * function called to create a table which stores the $_inputs array which is
-	 * used later for the pupose of form-handling.
-	 * helps to save the state of $_inputs to database.
-	 *
-	 */
-	public function buildFormEntriesTable($db_name = "requestDB", $table_name = "FormEntries") {
-		$hostname = "localhost";
-		$db_username = "root";
-		$db_password = "";
-		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
-		if ($conn->connect_error) {
-			die("Connection failed: ".$conn->connect_error);
-		}
-
-		// Create table
-		$sql = "CREATE TABLE ".$table_name."(
-		inputType VARCHAR(50) NOT NULL,
-		name VARCHAR(50) NOT NULL,
-		label VARCHAR(50),
-		defaultValue VARCHAR(50)
-		)";
-
-		if ($conn->query($sql) === TRUE) {
-			$conn->close();
-		}
-		else {
-			die("Unable to create Table ".$conn->error);
-		}
-
-		// Add Records to the above created Table
-		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
-		if ($conn->connect_error) {
-			die("Connection failed: ".$conn->connect_error);
-		}
-
-		foreach($this->_inputs as $key => $input) {
-			if ($input['inputType'] == "submit"){
-				continue;
-			}
-			$sql = "INSERT INTO ".$table_name."(inputType, name, label, defaultValue) 
-			VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
-			if ($conn->query($sql) === FALSE){
-				die("Unable to add entries to FormEntries table ".$conn->error);
-			}
-		}
-		$conn->close();
-
 	}
 
 }
