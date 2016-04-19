@@ -248,7 +248,7 @@ class Form
 			<title>".$this->title."</title>
 		</head>
 		<body>
-		<form method=\"".$this->method."\" action=\"../FormBuilder/submitRequest.php\" >";
+		<form method=\"".$this->method."\" action=\"../Scripts/handleRequest.php\" >";
 
 		foreach ($this->_inputs as $key => $input) {
 			// Skip the Database elements.
