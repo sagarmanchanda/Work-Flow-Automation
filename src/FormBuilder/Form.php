@@ -59,11 +59,11 @@ class Form
 	 * @param string $title
 	 *	The title of the web-form.
 	 */
-	function __construct($stateName, $stateID, $method = 'POST')
+	function __construct($stateName, $stateID)
 	{	
 		$this->stateName = $stateName;
 		$this->stateID = $stateID;
-		$this->method = $method;
+		$this->method = "POST";
 		$this->title = $stateName." Form";
 	}
 
