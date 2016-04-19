@@ -13,7 +13,7 @@ class DefineTransitions
 	}
 	public function defineParameters($stateName,$elementArray){
 		$error = this->validateParameters($stateName,$elementArray)
-		if(!isempty($error)){
+		if(!empty($error)){
 			die($error);
 		}
 		else{
@@ -24,7 +24,7 @@ class DefineTransitions
 
 	public function addTransition($valueArray,$response){
 		$error = this->validateTransition($valueArray,$response);
-		if(!isempty($error)){
+		if(!empty($error)){
 			die($error);
 		}
 		else{
