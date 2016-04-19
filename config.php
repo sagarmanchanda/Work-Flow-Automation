@@ -66,7 +66,9 @@
 		'databasePassword' => $databasePassword,
 		'loginDatabaseHostname' => $loginDatabaseHostname,
 		'loginDatabaseUsername' => $loginDatabaseUsername,
-		'loginDatabasePassword' => $loginDatabasePassword
+		'loginDatabasePassword' => $loginDatabasePassword,
+		'loginDatabaseName' => $loginDatabaseName,
+		'loginTableName' => $loginTableName
 	);
 
 ?>
