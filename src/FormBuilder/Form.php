@@ -26,7 +26,7 @@ class Form
 	 *
 	 * @var array
 	 */
-	protected $_inputs;
+	protected $_inputs=[];
 
 	/**
 	 * Index of the inputs.
@@ -90,6 +90,85 @@ class Form
 			'defaultValue' => $defaultValue
 			);
 		$this->index++;
+	}
+
+	/**
+	 * Function to add elements from database to act as identifiers. 'label' contains $columnName and 'defaultValue' contains 
+	 * $elementType.
+	 *
+	 * @param string $name
+	 * 
+	 * @param string $columnName
+	 *	column name corresponding to it in the database. 
+	 *
+	 * @param string $elementType
+	 *	Variable type as in int, text, etc.
+	 */
+	public function addDatabaseElement($name, $columnName, $elementType) {
+		$error = $this->validateAddDatabaseElement($name, $columnName, $elementType);
+		if (!empty($error)) {
+			die($error);
+		}
+		$this->_inputs[$this->index] = array(
+			'inputType' => "DATABASE",
+			'name' => $name,
+			'label' => $columnName,
+			'defaultValue' => $elementType
+			);
+		$this->index++;
+	}
+
+	/**
+	 * Function to validate the addition of Database elements to act as identifiers. 
+	 *
+	 * @param string $name
+	 * 
+	 * @param string $columnName
+	 *	column name corresponding to it in the database. 
+	 *
+	 * @param string $elementType
+	 *	Variable type as in int, text, etc.
+	 */
+	private function validateAddDatabaseElement($name, $columnName, $elementType) {
+		$config = include('config.php');
+		$loginDatabaseHostname = $config['loginDatabaseHostname'];
+		$loginDatabaseUsername = $config['loginDatabaseUsername'];
+		$loginDatabasePassword = $config['loginDatabasePassword'];
+		$loginDatabaseName = $config['loginDatabaseName'];
+		$loginTableName = $config['loginTableName'];
+		
+		$conn = new \mysqli($loginDatabaseHostname, $loginDatabaseUsername, $loginDatabasePassword, $loginDatabaseName);
+		if ($conn->connect_error) {
+			die("Connection Error:".$conn->connect_error);
+		}
+
+		$sql = "SHOW COLUMNS FROM ".$loginTableName or die("Unable to fetch column names from login table.");
+		$result = $conn->query($sql);
+		$index = 0;
+		$columns = [];
+		while ($row = \mysqli_fetch_assoc($result)) {
+			$columns[$index] = $row['Field'];
+			$index++;
+		}
+		// Checks if the given columnName is indeed present in the table.
+		$isValidColumnName = FALSE;
+		foreach ($columns as $column) {
+			if ($column == $columnName) {
+				$isValidColumnName = TRUE;
+			}
+		}
+		if (!$isValidColumnName) {
+			return "Such a column \"".$columnName."\" does not exist in login table.";
+		}
+		// Takes care of repetition.
+		foreach ($this->_inputs as $key => $input) {
+			if ($input['name'] == $name) {
+				return "\"".$name."\" name is already in use. Please use some other name for the element.";
+			}
+			if ($input['label'] == $columnName) {
+				return "You have already included \"".$columnName."\". You cannot do it again.";
+			}
+		}
 	}
 
 	/**
@@ -172,6 +251,10 @@ class Form
 		<form method=\"".$this->method."\" action=\"../FormBuilder/submitRequest.php\" >";
 
 		foreach ($this->_inputs as $key => $input) {
+			// Skip the Database elements.
+			if ($input['inputType'] == "DATABASE") {
+				continue;
+			}
 			// Check if email validation is required.
 			if (isset($input['rule']) && in_array('email', $input['rule'])) {
 				$input['inputType'] = 'email';
