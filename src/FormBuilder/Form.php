@@ -221,7 +221,7 @@ class Form
 			$conn->close();
 		}
 		else {
-			die("Unable to create database ".$conn->error);
+			die("Unable to create database :".$conn->error);
 		}
 
 		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
