@@ -197,53 +197,63 @@ class Form
 	}
 
 	
-
 	/**
 	 * function called to create a table which stores the contents of $_inputs array for a particular state in the requestDB
 	 * database in the table which is names after the state. This table would be later used for the pupose of deciding response
 	 * for a particular input from page and then further deciding the transition.
-	 *
+	 *	
+	 * @param $databaseName
+	 * 	Alwways use the default set value of the parameter, i.e. "RequestDB".
 	 */
-	public function buildFormEntriesTable($db_name = "requestDB", $table_name = "FormEntries") {
-		$hostname = "localhost";
-		$db_username = "root";
-		$db_password = "";
-		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
+	public function buildFormInputFieldTable($databaseName = "requestDB") {
+		// take credentials from config.php and connect to database.
+		$config = include('config.php');
+		$databaseHostname = $config['databaseHostname'];
+		$databaseUsername = $config['databaseUsername'];
+		$databasePassword = $config['databasePassword'];
+		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword);
 		if ($conn->connect_error) {
-			die("Connection failed: ".$conn->connect_error);
+			die("Connection Error:".$conn->connect_error);
+		}
+		// Connects to DB, create if does not exist.
+		$sql = "CREATE DATABASE IF NOT EXISTS ".$databaseName;
+		if ($conn->query($sql) === TRUE) {
+			$conn->close();
 		}
 
-		// Create table
-		$sql = "CREATE TABLE ".$table_name."(
+		// Creates a table with name as stateName for state's form input fields and saves the content.
+		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
+		if ($conn->connect_error) {
+			die("Connection Error: ".$conn->connect_error);
+		}
+
+		$sql = "CREATE TABLE IF NOT EXISTS ".$this->stateName."(
 		inputType VARCHAR(50) NOT NULL,
 		name VARCHAR(50) NOT NULL,
 		label VARCHAR(50),
 		defaultValue VARCHAR(50)
 		)";
-
 		if ($conn->query($sql) === TRUE) {
-			$conn->close();
+			// Empty the table, to override the contents.
+			$sql = "TRUNCATE TABLE ".$this->stateName;
+			$conn->query($sql);
+			foreach($this->_inputs as $key => $input) {
+			// Skip the submit buttons
+				if ($input['inputType'] == "submit") {
+					continue;
+				}
+				$sql = "INSERT INTO ".$this->stateName." (inputType, name, label, defaultValue) 
+				VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
+				if ($conn->query($sql) === FALSE) {
+					die("Unable to add entries to FormEntries table ".$conn->error);
+				}
+		}
 		}
 		else {
-			die("Unable to create Table ".$conn->error);
+			die("Unable to create Table for state \"".$this->stateName."\": ".$conn->error);			
 		}
 
-		// Add Records to the above created Table
-		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
-		if ($conn->connect_error) {
-			die("Connection failed: ".$conn->connect_error);
-		}
-
-		foreach($this->_inputs as $key => $input) {
-			if ($input['inputType'] == "submit"){
-				continue;
-			}
-			$sql = "INSERT INTO ".$table_name."(inputType, name, label, defaultValue) 
-			VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
-			if ($conn->query($sql) === FALSE){
-				die("Unable to add entries to FormEntries table ".$conn->error);
-			}
-		}
+		
 		$conn->close();
 
 	}
