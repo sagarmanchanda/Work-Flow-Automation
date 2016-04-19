@@ -46,6 +46,20 @@
 	*/
 	$loginDatabasePassword = '';
 
+	/**
+	* It stores the name of the database which has the login credentials.
+	*
+	* @var string
+	*/
+	$loginDatabaseName = '';	
+
+	/**
+	* It stores the name of the database which has the login credentials.
+	*
+	* @var string
+	*/
+	$loginTableName = '';	
+
 	return array(
 		'databaseHostname' => $databaseHostname,
 		'databaseUsername' => $databaseUsername,
