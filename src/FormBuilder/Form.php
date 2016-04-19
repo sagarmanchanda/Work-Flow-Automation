@@ -59,11 +59,11 @@ class Form
 	 * @param string $title
 	 *	The title of the web-form.
 	 */
-	function __construct($stateName, $stateID, $method = 'POST')
+	function __construct($stateName, $stateID)
 	{	
 		$this->stateName = $stateName;
 		$this->stateID = $stateID;
-		$this->method = $method;
+		$this->method = "POST";
 		$this->title = $stateName." Form";
 	}
 
@@ -248,7 +248,7 @@ class Form
 			<title>".$this->title."</title>
 		</head>
 		<body>
-		<form method=\"".$this->method."\" action=\"../FormBuilder/submitRequest.php\" >";
+		<form method=\"".$this->method."\" action=\"../Scripts/handleRequest.php\" >";
 
 		foreach ($this->_inputs as $key => $input) {
 			// Skip the Database elements.
