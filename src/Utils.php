@@ -21,9 +21,6 @@ class Utils
 
 		return $final;
 	}
-<<<<<<< HEAD
-}
-=======
 
 	/**
 	 * Utility function to filter a string. Prevents XSS and SQL injections.
@@ -38,4 +35,3 @@ class Utils
 		return $string;
 	}
 }
->>>>>>> 9bb662cb8f584cfb64de5b87007f4035bb53dc51
