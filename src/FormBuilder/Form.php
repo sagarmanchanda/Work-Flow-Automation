@@ -316,7 +316,9 @@ class Form
 
 
 	/**
-	 * Last function called for finally outputting the form.
+	 * Last function called for finally outputting the form.]
+	 * 
+	 * @deprecated
 	 */
 	public function buildForm() {
 		echo "<!DOCTYPE html>
