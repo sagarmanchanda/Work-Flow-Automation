@@ -34,6 +34,21 @@ class Form
 	 * @var int
 	 */
 	protected $index = 0;
+
+	/**
+	 * State name for which form would be defined.
+	 *
+	 * @var string
+	 */
+	protected $stateName;
+
+	/**
+	 * State ID for which form would be defined.
+	 *
+	 * @var string
+	 */
+	protected $stateID;
+
 	
 	/**
 	 * Contructor function, initializes the form.
@@ -44,10 +59,12 @@ class Form
 	 * @param string $title
 	 *	The title of the web-form.
 	 */
-	function __construct($method = 'POST', $title = 'WFA Form')
-	{
-		$this->title = $title;
+	function __construct($stateName, $stateID, $method = 'POST')
+	{	
+		$this->stateName = $stateName;
+		$this->stateID = $stateID;
 		$this->method = $method;
+		$this->title = $stateName." Form";
 	}
 
 	/**
@@ -139,38 +156,13 @@ class Form
 	}
 
 	/**
-	 * Last function called for finally outputting the form.
+	 * Creates html equivalent/template of the form described for a particular state. This function should be called at the end
+	 * once all the form entries are decided. The template is created in the Templates folder under src.
+	 *
 	 */
-	public function buildForm() {
-		echo "<!DOCTYPE html>
-		<html>
-		<head>
-			<title>$this->title</title>
-		</head>
-		<body>
-		<form method=\"$this->method\">";
-		foreach ($this->_inputs as $key => $input) {
-			// Check if email validation is required.
-			if (isset($input['rule']) && in_array('email', $input['rule'])) {
-				$input['inputType'] = 'email';
-			}
-
-			echo "<label>".$input['label']."</label><input type=\"".$input['inputType']."\" id=\"".$input['name']."\" name=\"".$input['name']."\" value=\"".$input['defaultValue']."\"";
-
-			// Check if field was required.
-			if (isset($input['rule']) && in_array('required', $input['rule'])) {
-				echo " required";
-			}
-
-			echo "><br></form>";
-		}
-	}
-
-	/**
-	 * Last function called for finally outputting the form as html into Template folder.
-	 */
-	public function buildForm_html() {
-		$formTemplate = fopen("src/Templates/formTemplate.php", "w") or die("Unable to create form template!");
+	public function buildFormTemplate() {
+		$formTemplatepath = "src/Templates/".$this->stateName.".php";
+		$formTemplate = fopen($formTemplatepath, "w") or die ("Unable to create html template for \"".$this->stateName."\" state.");
 		$formHtml = "<!DOCTYPE html>
 		<html>
 		<head>
@@ -191,8 +183,9 @@ class Form
 			if (isset($input['rule']) && in_array('required', $input['rule'])) {
 				$formHtml .= " required";
 			}
-
-			$formHtml .= "><br>";
+			// Makes the html page more readable, i.e. appending with a new line.
+			$formHtml .= ">
+			<br>";
 		}
 
 		$formHtml .= "</form>
@@ -202,6 +195,59 @@ class Form
 		fwrite($formTemplate, $formHtml);
 		fclose($formTemplate);
 	}
+
+	
+
+	/**
+	 * function called to create a table which stores the contents of $_inputs array for a particular state in the requestDB
+	 * database in the table which is names after the state. This table would be later used for the pupose of deciding response
+	 * for a particular input from page and then further deciding the transition.
+	 *
+	 */
+	public function buildFormEntriesTable($db_name = "requestDB", $table_name = "FormEntries") {
+		$hostname = "localhost";
+		$db_username = "root";
+		$db_password = "";
+		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
+		if ($conn->connect_error) {
+			die("Connection failed: ".$conn->connect_error);
+		}
+
+		// Create table
+		$sql = "CREATE TABLE ".$table_name."(
+		inputType VARCHAR(50) NOT NULL,
+		name VARCHAR(50) NOT NULL,
+		label VARCHAR(50),
+		defaultValue VARCHAR(50)
+		)";
+
+		if ($conn->query($sql) === TRUE) {
+			$conn->close();
+		}
+		else {
+			die("Unable to create Table ".$conn->error);
+		}
+
+		// Add Records to the above created Table
+		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
+		if ($conn->connect_error) {
+			die("Connection failed: ".$conn->connect_error);
+		}
+
+		foreach($this->_inputs as $key => $input) {
+			if ($input['inputType'] == "submit"){
+				continue;
+			}
+			$sql = "INSERT INTO ".$table_name."(inputType, name, label, defaultValue) 
+			VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
+			if ($conn->query($sql) === FALSE){
+				die("Unable to add entries to FormEntries table ".$conn->error);
+			}
+		}
+		$conn->close();
+
+	}
+
 
 	/**
 	 * function called to create a database with table for request handling. 
@@ -258,54 +304,33 @@ class Form
 
 	}
 
+
 	/**
-	 * function called to create a table which stores the $_inputs array which is
-	 * used later for the pupose of form-handling.
-	 * helps to save the state of $_inputs to database.
-	 *
+	 * Last function called for finally outputting the form.
 	 */
-	public function buildFormEntriesTable($db_name = "requestDB", $table_name = "FormEntries") {
-		$hostname = "localhost";
-		$db_username = "root";
-		$db_password = "";
-		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
-		if ($conn->connect_error) {
-			die("Connection failed: ".$conn->connect_error);
-		}
-
-		// Create table
-		$sql = "CREATE TABLE ".$table_name."(
-		inputType VARCHAR(50) NOT NULL,
-		name VARCHAR(50) NOT NULL,
-		label VARCHAR(50),
-		defaultValue VARCHAR(50)
-		)";
-
-		if ($conn->query($sql) === TRUE) {
-			$conn->close();
-		}
-		else {
-			die("Unable to create Table ".$conn->error);
-		}
-
-		// Add Records to the above created Table
-		$conn = new \mysqli($hostname, $db_username, $db_password, $db_name);
-		if ($conn->connect_error) {
-			die("Connection failed: ".$conn->connect_error);
-		}
-
-		foreach($this->_inputs as $key => $input) {
-			if ($input['inputType'] == "submit"){
-				continue;
+	public function buildForm() {
+		echo "<!DOCTYPE html>
+		<html>
+		<head>
+			<title>$this->title</title>
+		</head>
+		<body>
+		<form method=\"$this->method\">";
+		foreach ($this->_inputs as $key => $input) {
+			// Check if email validation is required.
+			if (isset($input['rule']) && in_array('email', $input['rule'])) {
+				$input['inputType'] = 'email';
 			}
-			$sql = "INSERT INTO ".$table_name."(inputType, name, label, defaultValue) 
-			VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
-			if ($conn->query($sql) === FALSE){
-				die("Unable to add entries to FormEntries table ".$conn->error);
-			}
-		}
-		$conn->close();
 
+			echo "<label>".$input['label']."</label><input type=\"".$input['inputType']."\" id=\"".$input['name']."\" name=\"".$input['name']."\" value=\"".$input['defaultValue']."\"";
+
+			// Check if field was required.
+			if (isset($input['rule']) && in_array('required', $input['rule'])) {
+				echo " required";
+			}
+
+			echo "><br></form>";
+		}
 	}
 
 }
