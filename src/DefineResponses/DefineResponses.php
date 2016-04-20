@@ -114,6 +114,15 @@ class DefineResponses
 		}
 		return "";
 	}
+
+	/**
+	 *Function to create a new lookup table in database to maintain the states and their transition variales.
+	 *
+	 * @param string $stateName
+	 *  Determines name of table.
+	 *
+	 * @param array $elementArray
+	 */
 	protected function createTable($stateName,$elementArray){
 		$tableName = "lookup_".$stateName;
 		$config = include('config.php');
