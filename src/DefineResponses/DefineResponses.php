@@ -14,6 +14,9 @@ class DefineResponses
 	 */
 	protected $validResponse = [];
 
+	/**
+	 * Constructor Function, initializes a state.
+	 */
 	function __construct(){		
 				
 	}
