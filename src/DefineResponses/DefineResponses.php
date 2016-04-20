@@ -215,6 +215,15 @@ class DefineResponses
 		return "";
 	}
 
+	/**
+	 *Funtion to add the Responses provided by user into table corresponding to the defined state.
+	 *
+	 * @param string $stateName
+	 *
+	 * @param array $valueArray
+	 *
+	 * @param string $response
+	 */
 	protected function insertResponses($stateName,$valueArray,$response){
 		$tableName = "lookup_".$stateName;
 		$config = include('config.php');
