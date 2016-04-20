@@ -21,6 +21,15 @@ class DefineResponses
 				
 	}
 	
+	/**
+	 *Function to define name of state and variables which cause transition of that state.
+	 *
+	 * @param string $stateName
+	 *  Name of state.
+	 *
+	 * @param array $elementArray
+	 *  Array of variables on which transition from given state depends on.
+	 */
 	public function defineParameters($stateName,$elementArray){
 		$error = $this->validateParameters($stateName,$elementArray);
 		if(!empty($error)){
