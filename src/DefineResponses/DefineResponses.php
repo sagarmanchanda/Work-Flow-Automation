@@ -69,6 +69,13 @@ class DefineResponses
 		}
 	}
 
+	/**
+	 *Function to validate state and variables on which it's transition depends on.
+	 *
+	 * @param string $stateName
+	 *
+	 * @param array $elementArray
+	 */
 	protected function validateParameters($stateName,$elementArray){
 		$config = include('config.php');
 		$databaseHostname = $config['databaseHostname'];
