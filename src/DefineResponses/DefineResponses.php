@@ -154,6 +154,15 @@ class DefineResponses
 
 	}
 
+	/**
+	 *Funtion to validate transitions amongst states of Finite Automaton.
+	 *
+	 * @param string $stateName
+	 *
+	 * @param array $valueArray
+	 *
+	 * @param string $response
+	 */
 	protected function validateResponses($stateName,$valueArray,$response){
 		$tableName = "lookup_".$stateName;
 		$config = include('config.php');
