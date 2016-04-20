@@ -28,12 +28,12 @@ class DefineResponses
 	}
 
 	public function addResponses($stateName,$valueArray,$response){
-		$error = $this->validateTransition($stateName,$valueArray,$response);
+		$error = $this->validateResponses($stateName,$valueArray,$response);
 		if(!empty($error)){
 			die($error);
 		}
 		else{
-			$error = $this->insertTransition($stateName,$valueArray,$response);
+			$error = $this->insertResponses($stateName,$valueArray,$response);
 			if(!empty($error)){
 				die($error);
 			}
@@ -53,6 +53,7 @@ class DefineResponses
 		if ($conn->connect_error) {
 			die("Connection Error:".$conn->connect_error);
 		}
+		$ind = 0;
 		foreach ($elementArray as $key => $value) {
 			$sql = "SELECT inputType FROM ".$tableName." WHERE name ='".$value."'";
 			$result = $conn->query($sql);
@@ -65,7 +66,17 @@ class DefineResponses
 			{
 				return "Fatal error : ".$value." not found in table";
 			}
-			//logic to create an array to validate responses
+			if ($type['inputType']=="radio") {
+				array_push($this->validResponse,"RADIO");
+			}
+			else if ($type['inputType']=="logic") {
+				array_push($this->validResponse,"LOGIC");
+			}
+			else
+			{
+				array_push($this->validResponse,"STRING");
+			}
+			$ind++;
 		}
 		return "";
 	}
@@ -117,6 +128,37 @@ class DefineResponses
 		$num=mysqli_num_fields($query);
 		if (sizeof($valueArray)!=$num-1) {
 			return "invalid no of arguements";
+		}
+		$ind = 0;
+		foreach ($valueArray as $key => $value) {
+			if ($value=="NULL") {
+				$ind++;
+				continue;
+			}
+			else if ( $this->validResponse[$ind]=="STRING"	) {
+				$ind++;
+				continue;
+			}
+			else if ( $this->validResponse[$ind]=="RADIO"	) {
+				if ($value == "true" || $value=="false") {
+					$ind++;
+					continue;
+				}
+				else{
+					return "Error : invalid value ".$value;
+				}
+				
+			}
+			// else if ( $this->validResponse["'".$ind."'"]=="LOGIC"	) {
+			// 	if (//add valid logic for LOGIC) {
+			// 		$ind++;
+			// 		continue;
+			// 	}
+			// 	else{
+			// 		return "Error : invalid value ".$value ;
+			// 	}
+				
+			// }
 		}
 		//logic to validate arguements.
 		return "";
