@@ -7,12 +7,17 @@ namespace WFA\DefineResponses;
 */
 class DefineResponses
 {
-	
+	/**
+	 * Contains set of valid responses
+	 *
+	 * @var array
+	 */
 	protected $validResponse = [];
 
 	function __construct(){		
 				
 	}
+	
 	public function defineParameters($stateName,$elementArray){
 		$error = $this->validateParameters($stateName,$elementArray);
 		if(!empty($error)){
@@ -40,7 +45,6 @@ class DefineResponses
 			
 		}
 	}
-
 
 	protected function validateParameters($stateName,$elementArray){
 		$config = include('config.php');
@@ -80,7 +84,6 @@ class DefineResponses
 		}
 		return "";
 	}
-
 	protected function createTable($stateName,$elementArray){
 		$tableName = "lookup_".$stateName;
 		$config = include('config.php');
