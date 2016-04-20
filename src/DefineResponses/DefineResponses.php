@@ -48,8 +48,7 @@ class DefineResponses
 		$databaseUsername = $config['databaseUsername'];
 		$databasePassword = $config['databasePassword'];
 		$databaseName = "requestDB";
-		//add logic to table name below.
-		$tableName = "table1";
+		$tableName = $stateName;
 		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
 		if ($conn->connect_error) {
 			die("Connection Error:".$conn->connect_error);
