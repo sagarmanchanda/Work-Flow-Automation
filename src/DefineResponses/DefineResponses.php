@@ -44,6 +44,17 @@ class DefineResponses
 
 	}
 
+	/**
+	 *Function to add transition from one state to another.
+	 *
+	 * @param string $stateName
+	 * 
+	 * @param array $valueArray
+	 *  Contains value of variables on which they cause the particular transition from given state
+	 *
+	 * @param string $response
+	 *  Represents the transition.
+	 */
 	public function addResponses($stateName,$valueArray,$response){
 		$error = $this->validateResponses($stateName,$valueArray,$response);
 		if(!empty($error)){
