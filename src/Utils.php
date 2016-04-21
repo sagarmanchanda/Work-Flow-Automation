@@ -23,6 +23,36 @@ class Utils
 	}
 
 	/**
+	 * Get MySQL configuration from wfa.config.
+	 *
+	 * @return array|NULL
+	 *  The config array returned.
+	 */
+	public static function getConfig() {
+		$wfaConfig = fopen("wfa.config", "r");
+		if (!$wfaConfig) {
+			// In case wfa.config does not exist.
+			return NULL;
+		}
+
+		$data = fgetcsv($wfaConfig);
+
+		$databaseHostname = $data[0];
+		$databaseUsername = $data[1];
+		$databasePassword = $data[2];
+		$databaseName = $data[3];
+
+		$config = array(
+			'databaseHostname' => $databaseHostname,
+			'databaseUsername' => $databaseUsername,
+			'databasePassword' => $databasePassword,
+			'databaseName' => $databaseName,
+		);
+
+		return $config;
+	}
+
+	/**
 	 * Utility function to filter a string. Prevents XSS and SQL injections.
 	 *
 	 * @param $string
