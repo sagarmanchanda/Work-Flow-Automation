@@ -23,6 +23,55 @@ class Utils
 	}
 
 	/**
+	 * Get MySQL configuration from wfa.config.
+	 *
+	 * @return array|NULL
+	 *  The config array returned.
+	 */
+	public static function getConfig() {
+		$wfaConfig = fopen("wfa.config", "r");
+		if (!$wfaConfig) {
+			// In case wfa.config does not exist.
+			return NULL;
+		}
+
+		$data = fgetcsv($wfaConfig);
+
+		$databaseHostname = $data[0];
+		$databaseUsername = $data[1];
+		$databasePassword = $data[2];
+		$databaseName = $data[3];
+
+		$config = array(
+			'databaseHostname' => $databaseHostname,
+			'databaseUsername' => $databaseUsername,
+			'databasePassword' => $databasePassword,
+			'databaseName' => $databaseName,
+		);
+
+		return $config;
+	}
+	/**
+	 * Function used to connect to mysql using given settings.
+	 *
+	 * @param string $databaseHostname
+	 * @param string $databaseUsename
+	 * @param string $databasePassword
+	 * @param string $databaseName
+	 *  Default value NULL because it may or may not be required.
+	 *
+	 * @return object|bool
+	 */
+	public static function connectMysql($databaseHostname, $databaseUsername, $databasePassword, $databaseName = NULL) {
+		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
+		if ($conn->connect_error) {
+    		return FALSE;
+		} else {
+			return $conn;
+		}
+	}
+
+	/**
 	 * Utility function to filter a string. Prevents XSS and SQL injections.
 	 *
 	 * @param $string
