@@ -118,36 +118,41 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 // $responseLookupTableColumns contains all the names and values that are required to get response.
 
-// Add support for logical statements...
+// Add support for logical statements processing...
 
 // Calculate response from lookup table
-// $index = 0;
-// $sql = "SELECT * FROM lookup_".$presentStateName." WHERE ";
-// foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
-// 	if ($index == $responseLookupTableColumnIndex-1) {
-// 		break;
-// 	}
-// 	foreach ($_inputs as $key => $input) {
-// 		if ($input['name'] == $responseLookupTableColumn) {
-// 			$value = $input['value'];
-// 		}
-// 	}
-// 	$sql .= $responseLookupTableColumn." = \"".$value."\" AND ";
-// 	$index++;
-// }
-// foreach ($_inputs as $key => $input) {
-// 	if ($input['name'] == $responseLookupTableColumns[$index]) {
-// 		$value = $input['value'];
-// 	}
-// }
-// $sql .= $responseLookupTableColumns[$index]." = \"".$value."\"";
 
-// $result = $conn->query($sql);
+$index = 0;
+$sql = "SELECT * FROM lookup_".$stateName."_generation"." WHERE ";
+foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
+	if ($index == count($responseLookupTableColumns)-1) {
+		break;
+	}
+	$sql .= $responseLookupTableColumn['name']." = \"".$responseLookupTableColumn['value']."\" AND ";
+	$index++;
+}
+$sql .= $responseLookupTableColumns[$index]['name']." = \"".$responseLookupTableColumns[$index]['value']."\"";
 
+$result = $conn->query($sql);
+while ($row = mysqli_fetch_assoc($result)) {
+	$response = $row['response'];
+}
+if (empty($row)) {
+	die("No possible response defined for such action. Kindly fill the form properly again.");
+}
 
 // Calculate next state from lookup table
-// Update DB data + presentState of request which will be different for state=0/1.
+$sql = "SELECT * FROM AutomataTransitions WHERE presentState=\"".$stateName."\" AND response=\"".$response."\"";
+$result = $conn->query($sql) or die("Unable to connect to transition table to find next state.");
+while ($row = mysqli_fetch_assoc($result)) {
+	$nextState = $row['nextState'];
+}
+if (empty($row)) {
+	die("No possible transition exists for such response...");
+}
 
+// Update DB data
+ 
 
 
 // Close the connections to database.
