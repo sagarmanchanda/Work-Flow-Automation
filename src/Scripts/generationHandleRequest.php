@@ -5,9 +5,10 @@ if (session_id() == "") {
 }
 
 // Get the present state name/ID, username stored in Session variables. 
-$presentStateName = $_SESSION['stateName'];
-$presentStateID = $_SESSION['stateID'];
-$username = $_SESSION['userName'];
+$stateName = $_SESSION['stateName'];
+$stateID = $_SESSION['stateID'];
+
+$username = $_SESSION['user_name'];
 $usernameColumn = $_SESSION['db_user_column']; //Remove this wierd variable name.
 
 // Get the credentials to connect to Databse from config file.
@@ -20,7 +21,7 @@ $loginDatabaseUsername = $config['loginDatabaseUsername'];
 $loginDatabasePassword = $config['loginDatabasePassword'];
 $loginDatabaseName = $config['loginDatabaseName'];
 $loginTableName = $config['loginTableName'];
-
+$databaseName = "requestDB";
 // Connecting to Database.
 $conn = new mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
 if ($conn->connect_error) {
@@ -36,78 +37,112 @@ if ($loginconn->connect_error) {
 // Now see what you should expect to be coming from the form and save it in $_inputs.
 $_inputs = [];
 $index = 0;
-$sql = "SELECT names, inputType, label  FROM ".$presentStateName;
+$sql = "SELECT * FROM ".$stateName."_"."generation";
 $result = $conn->query($sql);
 while ($row = mysqli_fetch_assoc($result)) {
 	$_inputs[$index] = array(
 		'name' => $row['name'],
 		'inputType' => $row['inputType'],
 		'label' => $row['label'],
-		'defaultValue' => $row['defaultValue'];
-		); 
+		'defaultValue' => $row['defaultValue'],
+		);
+	$index++;
 }
 
-// Now collect the data coming.
-foreach ($_inputs as $key => $input) {
-	if ($input['inputType'] == "DATABASE") {
-		$sql = "SELECT * FROM ".$loginTableName." WHERE ".$usernameColumn."=\"".$userName."\""; 
-		$result = $loginconn->query($sql);
-		$input['value'] = $result[$input['label']];
-	}
-	else {
-		$formInputValue = $_POST[$input['name']];
-		$input['value'] = $formInputValue;
+// Sanitize the input.
+
+// Now collect the data.
+$values = [];
+$index = 0;
+if (isset($_POST['submit'])) {
+
+	foreach ($_inputs as $key => $input) {
+		if ($input['inputType'] == "DATABASE") {
+			$sql = "SELECT * FROM ".$loginTableName." WHERE ".$usernameColumn."=\"".$username."\""; 
+			$result = $loginconn->query($sql);
+			while ($row = mysqli_fetch_assoc($result)) {
+				$values[$index] = array(
+					'value' => $row[$input['label']],
+					'name' => $input['name']
+				);
+			}
+		}
+		else {
+			if ($input['inputType'] == "radio") {
+				if (isset($_POST[$input['name']]) && $_POST[$input['name']] == "TRUE"){
+					$values[$index] = array(
+						'value' => "TRUE",
+						'name' => $input['name']
+					);
+				}
+				else {
+					$values[$index] = array(
+						'value' => "FALSE",
+						'name' => $input['name']
+					);
+				}
+			}
+			else {
+				$temp = $input['name'];
+				$formInputValue = $_POST[$temp];
+				$values[$index] = array(
+					'value' => $formInputValue,
+					'name' => $input['name']
+				);
+			}
+		}
+		$index++;
 	}
 }
+
+// $values has all the names and values coming from page...
+
 
 // Clean the dict for empty value. replace with false wherever required. and convert to string.
-foreach ($_inputs as $key => $input) {
-	if ($input['inputType'] == "radio" || $input['value'] == "") {
-		$input['value'] = "FALSE";
-	}
-	if (!is_string($input['value'])) {
-		$temp = (string)$input['value'];
-		$input['value'] = $temp;
-	}
-}
 
-
-
-$sql = "SHOW COLUMNS FROM lookup_".$presentStateName or die("Unable to fetch column names from response lookup table.");
+$sql = "SHOW COLUMNS FROM lookup_".$stateName."_generation" or die("Unable to fetch column names from response lookup table.");
 $result = $conn->query($sql);
 $index = 0;
 $responseLookupTableColumns = [];
 while ($row = mysqli_fetch_assoc($result)) {
-	$responseLookupTableColumns[$index] = $row['Field'];
+	foreach ($values as $key => $value) {
+		if($row['Field'] == $value['name']) {
+			$responseLookupTableColumns[$index] = array(
+				'name' => $value['name'],
+				'value' => $value['value']
+				);
+		}
+	}
 	$index++;
 }
-$responseLookupTableColumnIndex = $index;
+
+// $responseLookupTableColumns contains all the names and values that are required to get response.
 
 // Add support for logical statements...
 
 // Calculate response from lookup table
-$index = 0;
-$sql = "SELECT * FROM lookup_".$presentStateName." WHERE ";
-foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
-	if ($index == $responseLookupTableColumnIndex-1) {
-		break;
-	}
-	foreach ($_inputs as $key => $input) {
-		if ($input['name'] == $responseLookupTableColumn) {
-			$value = $input['value'];
-		}
-	}
-	$sql .= $responseLookupTableColumn." = \"".$value."\" AND ";
-	$index++;
-}
-foreach ($_inputs as $key => $input) {
-	if ($input['name'] == $responseLookupTableColumns[$index]) {
-		$value = $input['value'];
-	}
-}
-$sql .= $responseLookupTableColumns[$index]." = \"".$value."\"";
+// $index = 0;
+// $sql = "SELECT * FROM lookup_".$presentStateName." WHERE ";
+// foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
+// 	if ($index == $responseLookupTableColumnIndex-1) {
+// 		break;
+// 	}
+// 	foreach ($_inputs as $key => $input) {
+// 		if ($input['name'] == $responseLookupTableColumn) {
+// 			$value = $input['value'];
+// 		}
+// 	}
+// 	$sql .= $responseLookupTableColumn." = \"".$value."\" AND ";
+// 	$index++;
+// }
+// foreach ($_inputs as $key => $input) {
+// 	if ($input['name'] == $responseLookupTableColumns[$index]) {
+// 		$value = $input['value'];
+// 	}
+// }
+// $sql .= $responseLookupTableColumns[$index]." = \"".$value."\"";
 
-$result = $conn->query($sql);
+// $result = $conn->query($sql);
 
 
 // Calculate next state from lookup table
