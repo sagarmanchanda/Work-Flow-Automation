@@ -51,14 +51,14 @@
 	*
 	* @var string
 	*/
-	$loginDatabaseName = '';	
+	$loginDatabaseName = 'WFA';	
 
 	/**
 	* It stores the name of the database which has the login credentials.
 	*
 	* @var string
 	*/
-	$loginTableName = '';	
+	$loginTableName = 'Login';	
 
 	return array(
 		'databaseHostname' => $databaseHostname,

@@ -49,12 +49,6 @@ class Form
 	 */
 	protected $stateID;
 
-	/**
-	 * State Type for which form would be defined.
-	 *
-	 * @var string
-	 */
-	protected $stateType;
 	
 	/**
 	 * Contructor function, initializes the form.
@@ -65,11 +59,10 @@ class Form
 	 * @param string $title
 	 *	The title of the web-form.
 	 */
-	function __construct($stateName, $stateID, $stateType)
+	function __construct($stateName, $stateID)
 	{	
 		$this->stateName = $stateName;
 		$this->stateID = $stateID;
-		$this->stateType = $stateType;
 		$this->method = "POST";
 		$this->title = $stateName." Form";
 	}
@@ -247,20 +240,15 @@ class Form
 	 *
 	 */
 	public function buildFormTemplate() {
-		$formTemplatepath = "src/Templates/".$this->stateName."_".$this->stateType.".php";
-		$formTemplate = fopen($formTemplatepath, "w") or die ("Unable to create html template for \"".$this->stateName."_".$this->stateType."\" state.");
+		$formTemplatepath = "src/Templates/".$this->stateName.".php";
+		$formTemplate = fopen($formTemplatepath, "w") or die ("Unable to create html template for \"".$this->stateName."\" state.");
 		$formHtml = "<!DOCTYPE html>
 		<html>
 		<head>
 			<title>".$this->title."</title>
 		</head>
-		<body>";
-		if ($this->stateType == "generation") {
-			$formHtml .= "<form method=\"".$this->method."\" action=\"../Scripts/generationHandleRequest.php\" >";
-		}
-		else {
-			$formHtml .= "<form method=\"".$this->method."\" action=\"../Scripts/translationHandleRequest.php\" >";			
-		}
+		<body>
+		<form method=\"".$this->method."\" action=\"../Scripts/handleRequest.php\" >";
 
 		foreach ($this->_inputs as $key => $input) {
 			// Skip the Database elements.
@@ -322,7 +310,7 @@ class Form
 			die("Connection Error: ".$conn->connect_error);
 		}
 
-		$sql = "CREATE TABLE IF NOT EXISTS ".$this->stateName."_".$this->stateType."(
+		$sql = "CREATE TABLE IF NOT EXISTS ".$this->stateName."(
 		inputType VARCHAR(50) NOT NULL,
 		name VARCHAR(50) NOT NULL,
 		label VARCHAR(50),
@@ -330,14 +318,14 @@ class Form
 		)";
 		if ($conn->query($sql) === TRUE) {
 			// Empty the table, to override the contents.
-			$sql = "TRUNCATE TABLE ".$this->stateName."_".$this->stateType;
+			$sql = "TRUNCATE TABLE ".$this->stateName;
 			$conn->query($sql);
 			foreach($this->_inputs as $key => $input) {
 			// Skip the submit buttons
 				if ($input['inputType'] == "submit") {
 					continue;
 				}
-				$sql = "INSERT INTO ".$this->stateName."_".$this->stateType." (inputType, name, label, defaultValue) 
+				$sql = "INSERT INTO ".$this->stateName." (inputType, name, label, defaultValue) 
 				VALUES (\"".$input['inputType']."\", \"".$input['name']."\", \"".$input['label']."\", \"".$input['defaultValue']."\")";
 				if ($conn->query($sql) === FALSE) {
 					die("Unable to add entries to FormEntries table ".$conn->error);
@@ -345,7 +333,7 @@ class Form
 		}
 		}
 		else {
-			die("Unable to create Table for state \"".$this->stateName."_".$this->stateType."\": ".$conn->error);			
+			die("Unable to create Table for state \"".$this->stateName."\": ".$conn->error);			
 		}
 
 		
