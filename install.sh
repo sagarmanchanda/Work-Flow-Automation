@@ -11,16 +11,16 @@ nc='tput sgr0'
 clear
 
 # Composer related installation.
-echo -n "$($red)Enter http proxy (skip if it's already set in the environment):$($nc)"
-read proxy
-
-if [ "$proxy" != "" ]
-	then export HTTP_PROXY=$proxy
-fi
-#sudo apt-get update
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/local/bin/composer
-composer install
+#echo -n "$($red)Enter http proxy (skip if it's already set in the environment):$($nc)"
+#read proxy
+#
+#if [ "$proxy" != "" ]
+#	then export HTTP_PROXY=$proxy
+#fi
+##sudo apt-get update
+#curl -sS https://getcomposer.org/installer | php
+#sudo mv composer.phar /usr/local/bin/composer
+#composer install
 
 echo "$($yellow)$($blackbg)[OK]$($nc)"
 
@@ -53,11 +53,14 @@ do
 
 	if [ $phpout = 0 ]
 	then
-		echo -e "$($red)ERROR: Invalid credentials or mysql not running. Please fix.$($nc)"
+		echo "$($green)Database successfully created and settings saved!$($nc)"
+		break
 	elif [ $phpout = 1 ]
 	then
-		echo "$($green)Database successfully created.$($nc)"
-		break
+		echo "$($red)ERROR: Invalid credentials or mysql not running. Please fix.$($nc)"
+	elif [ $phpout = 2 ]
+	then
+		echo "$($red)ERROR: Unable to write wfa.config. Please check your read write permissions on the WFA module folder.$($nc) (Example: Use sudo chmod or sudo chown)."
 	fi
 done
-	
+
