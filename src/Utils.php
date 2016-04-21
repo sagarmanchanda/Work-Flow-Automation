@@ -99,6 +99,9 @@ class Utils
 		$sql = "SELECT stateName, stateType FROM AutomataStates" or die("Unable to connect to AutomataStates Tables. Looks like you have not defined states yet!");
 		$result = $conn->query($sql);
 		while ($row = \mysqli_fetch_assoc($result)) {
+			if ($row['stateType'] == "final") {
+				continue;
+			}
 			$states[$index] = $row['stateName']."_".$row['stateType'];
 			$index++;
 		}
@@ -107,12 +110,11 @@ class Utils
 		$index = 0;
 		foreach ($states as $state) {
 			$sql = "SELECT name FROM ".$state or die("Unable to connect to \"".$state."\" table. Looks like you have not defined form for the state.");
+			#echo $sql;
 			$result = $conn->query($sql);
-			if ($conn->query($sql) === TRUE) {
-				while ($row = \mysqli_fetch_assoc($result)) {
-					$columns[$index] = $row['name'];
-					$index++;
-				}
+			while ($row = \mysqli_fetch_assoc($result)) {
+				$columns[$index] = $row['name'];
+				$index++;
 			}
 		}
 		// Finally creating the table.
