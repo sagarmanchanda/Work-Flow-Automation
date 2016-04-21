@@ -51,6 +51,25 @@ class Utils
 
 		return $config;
 	}
+	/**
+	 * Function used to connect to mysql using given settings.
+	 *
+	 * @param string $databaseHostname
+	 * @param string $databaseUsename
+	 * @param string $databasePassword
+	 * @param string $databaseName
+	 *  Default value NULL because it may or may not be required.
+	 *
+	 * @return object|bool
+	 */
+	public static function connectMysql($databaseHostname, $databaseUsername, $databasePassword, $databaseName = NULL) {
+		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
+		if ($conn->connect_error) {
+    		return FALSE;
+		} else {
+			return $conn;
+		}
+	}
 
 	/**
 	 * Utility function to filter a string. Prevents XSS and SQL injections.

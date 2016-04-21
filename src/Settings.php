@@ -14,26 +14,6 @@ namespace WFA;
 class Settings
 {
 	/**
-	 * Function used to connect to mysql using given settings.
-	 *
-	 * @param string $databaseHostname
-	 * @param string $databaseUsename
-	 * @param string $databasePassword
-	 * @param string $databaseName
-	 *  Default value NULL because it may or may not be required.
-	 *
-	 * @return object|bool
-	 */
-	public static function connectMysql($databaseHostname, $databaseUsername, $databasePassword, $databaseName = NULL) {
-		$conn = new \mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
-		if ($conn->connect_error) {
-    		return FALSE;
-		} else {
-			return $conn;
-		}
-	}
-
-	/**
 	 * If you're using this function in your code. STOP!
 	 * ONLY MEANT TO BE USED DURING INSTALLATION BY THE INSTALL SCRIPT.
 	 *
@@ -41,7 +21,7 @@ class Settings
 	 * a horrible demise by getting crushed under a roller-coaster.
 	 */
 	public static function setUpDatabase($databaseHostname, $databaseUsername, $databasePassword) {
-		$conn = self::connectMysql($databaseHostname, $databaseUsername, $databasePassword);
+		$conn = \WFA\Utils::connectMysql($databaseHostname, $databaseUsername, $databasePassword);
 		if (!$conn) {
 			// ERROR: Invalid credentials or mysql not running. Please fix.
 			return 1;
