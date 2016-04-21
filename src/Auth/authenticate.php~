@@ -16,8 +16,6 @@ if(count($_POST)>0) {
 	
 	if(is_array($row)) {
 		$_SESSION["user_name"] = $row['username'];
-		$_SESSION['stateName'] = $row['stateName'];
-		$_SESSION['stateID'] = $row['stateID'];
 	} 
 	else {
 			header("Location:../Templates/login_failure.php");

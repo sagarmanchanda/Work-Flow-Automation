@@ -12,7 +12,8 @@
 <body>
 	<h1> Welcome 
 	<?php 
-		echo $_SESSION['user_name'];
+		echo $_SESSION['user_name']." ";
+		echo $_SESSION['stateName'];
 	?>
 	</h1>
 	<br>

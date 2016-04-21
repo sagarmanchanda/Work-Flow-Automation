@@ -96,21 +96,23 @@ class Utils
 		// First extract all the states declared.
 		$states = [];
 		$index = 0;
-		$sql = "SELECT stateName FROM AutomataStates" or die("Unable to connect to AutomataStates Tables. Looks like you have not defined states yet!");
+		$sql = "SELECT stateName, stateType FROM AutomataStates" or die("Unable to connect to AutomataStates Tables. Looks like you have not defined states yet!");
 		$result = $conn->query($sql);
 		while ($row = \mysqli_fetch_assoc($result)) {
-			$states[$index] = $row['stateName'];
+			$states[$index] = $row['stateName']."_".$row['stateType'];
 			$index++;
 		}
 		// Now go to every state table and extract all the required columns.
 		$columns = [];
 		$index = 0;
 		foreach ($states as $state) {
-			$sql = "SELECT name FROM ".$state or die("Unable ti connect to \"".$state."\" table. Looks like you have not defined form for the state.");
+			$sql = "SELECT name FROM ".$state or die("Unable to connect to \"".$state."\" table. Looks like you have not defined form for the state.");
 			$result = $conn->query($sql);
-			while ($row = \mysqli_fetch_assoc($result)) {
-				$columns[$index] = $row['name'];
-				$index++;
+			if ($conn->query($sql) === TRUE) {
+				while ($row = \mysqli_fetch_assoc($result)) {
+					$columns[$index] = $row['name'];
+					$index++;
+				}
 			}
 		}
 		// Finally creating the table.

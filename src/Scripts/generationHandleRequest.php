@@ -73,7 +73,43 @@ foreach ($_inputs as $key => $input) {
 
 
 
+$sql = "SHOW COLUMNS FROM lookup_".$presentStateName or die("Unable to fetch column names from response lookup table.");
+$result = $conn->query($sql);
+$index = 0;
+$responseLookupTableColumns = [];
+while ($row = mysqli_fetch_assoc($result)) {
+	$responseLookupTableColumns[$index] = $row['Field'];
+	$index++;
+}
+$responseLookupTableColumnIndex = $index;
+
+// Add support for logical statements...
+
 // Calculate response from lookup table
+$index = 0;
+$sql = "SELECT * FROM lookup_".$presentStateName." WHERE ";
+foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
+	if ($index == $responseLookupTableColumnIndex-1) {
+		break;
+	}
+	foreach ($_inputs as $key => $input) {
+		if ($input['name'] == $responseLookupTableColumn) {
+			$value = $input['value'];
+		}
+	}
+	$sql .= $responseLookupTableColumn." = \"".$value."\" AND ";
+	$index++;
+}
+foreach ($_inputs as $key => $input) {
+	if ($input['name'] == $responseLookupTableColumns[$index]) {
+		$value = $input['value'];
+	}
+}
+$sql .= $responseLookupTableColumns[$index]." = \"".$value."\"";
+
+$result = $conn->query($sql);
+
+
 // Calculate next state from lookup table
 // Update DB data + presentState of request which will be different for state=0/1.
 

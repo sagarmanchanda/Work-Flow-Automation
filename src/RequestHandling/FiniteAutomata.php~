@@ -55,20 +55,15 @@ class FiniteAutomata
 	 *
 	 * @param int $stateID
 	 *	ID of the state which will appear in RequestStatus.
-	 *
-	 * @param string $stateType
-	 *	type of the state.
-	 *
 	 */
-	public function addState($stateName, $stateID, $stateType) {
-		$error = $this->validateState($stateName, $stateID, $stateType);
+	public function addState($stateName, $stateID) {
+		$error = $this->validateState($stateName, $stateID);
 		if (!empty($error)) {
 			die($error);
 		}
 		$this->_states[$this->stateIndex] = array(
 			'stateName' => $stateName,
-			'stateID' => $stateID,
-			'stateType' => $stateType
+			'stateID' => $stateID
 			);
 		$this->stateIndex++;
 	}
@@ -76,35 +71,24 @@ class FiniteAutomata
 	/**
 	 * Checks if the given addition of state is valid or not.
 	 *
-	* @param string $stateName
+	 * @param string $stateName
 	 *	Name of the state.
 	 *
 	 * @param int $stateID
 	 *	ID of the state which will appear in RequestStatus.
-	 *
-	 * @param string $stateType
-	 *	type of the state.
-	 *
 	 */
-	protected function validateState($stateName, $stateID, $stateType) {
-		if (!isset($stateName) || !isset($stateType)) {
-			return "State name or type cannot be empty";
-		}
-		$isValidStateType = FALSE;
-		if ( $stateType == "generation" || $stateType == "translation" || $stateType == "final") {
-			$isValidStateType = TRUE;
-		}
-		if (!$isValidStateType) {
-			return "Please enter a valid value for stateType for \"".$stateName."\"";
+	protected function validateState($stateName, $stateID) {
+		if (!isset($stateName)) {
+			return "State name cannot be empty";
 		}
 		foreach ($this->_states as $key => $state) {
-			if ($state['stateName'] == $stateName && $state['stateType'] == $stateType) {
-				return "STATENAME CONFLICT: \"".$stateName."\" with type \"".$stateType."\" state already in use. Please use some other state name or type.";
+			if ($state['stateName'] == $stateName) {
+				return "STATENAME CONFLICT: \"".$stateName."\" state name already in use. Please use some other state name.";
 			}
 		}
 		foreach ($this->_states as $key => $state) {
-			if ($state['stateID'] == $stateID && $state['stateType'] == $stateType) {
-				return "STATEID CONFLICT: \"".$stateID."\" state id with type \"".$stateType."\" already in use. Please use some other state id or type.";
+			if ($state['stateID'] == $stateID) {
+				return "STATEID CONFLICT: \"".$stateID."\" state id already in use. Please use some other state id.";
 			}
 		}
 	}
@@ -221,17 +205,15 @@ class FiniteAutomata
 		}
 
 		$sql = "CREATE TABLE IF NOT EXISTS ".$stateTableName." (
-		stateIndex INT(5) PRIMARY KEY,
 		stateName VARCHAR(50) NOT NULL,
-		stateID INT(5),
-		stateType VARCHAR(50) NOT NULL 
+		stateID INT(5) PRIMARY KEY 
 		)";
 		if ($conn->query($sql) === TRUE) {
 			// Empty the table, to override the contents.
 			$sql = "TRUNCATE TABLE ".$stateTableName;
 			$conn->query($sql);
 			foreach ($this->_states as $key => $state) {
-				$sql = "INSERT INTO ".$stateTableName."(stateIndex, stateName, stateID, stateType) VALUES (\"".$key."\", \"".$state['stateName']."\", \"".$state['stateID']."\", \"".$state['stateType']."\")";
+				$sql = "INSERT INTO ".$stateTableName."(stateName, stateID) VALUES (\"".$state['stateName']."\", \"".$state['stateID']."\")";
 				if ($conn->query($sql) === FALSE) {
 					die("Unable to add entries to table ".$stateTableName);
 				}
