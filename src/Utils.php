@@ -124,7 +124,7 @@ class Utils
 		foreach ($columns as $column) {
 			$sql .= $column." VARCHAR(1000), ";
 		}
-		$sql .= "presentState INT(3) NOT NULL
+		$sql .= "presentState VARCHAR(50) NOT NULL
 		)";
 
 		if ($conn->query($sql) === TRUE) {
