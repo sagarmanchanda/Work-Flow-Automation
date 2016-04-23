@@ -154,7 +154,17 @@ else{
 }
 
 // Update the DB....
-$sql = "UPDATE RequestHandlingMain SET presentState=\"".$nextState."\" WHERE requestID=\"".$requestID."\"";
+$sql = "UPDATE RequestHandlingMain SET presentState=\"".$nextState."\", ";
+$index = 0;
+foreach ($values as $key => $value) {
+	if($index == count($values)-1){
+		break;
+	}
+	$sql .= $value['name']."=\"".$value['value']."\", ";
+	$index++;
+}
+$sql .= $values[$index]['name']."=\"".$values[$index]['value']."\" WHERE requestID=\"".$requestID."\"";
+
 if($conn->query($sql) === TRUE) {
 	echo "transition successful";
 	header("Location:../Templates/dashboard.php");
