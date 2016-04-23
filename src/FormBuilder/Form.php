@@ -258,10 +258,7 @@ class Form
 		if ($this->stateType == "generation") {
 			$formHtml .= "<form method=\"".$this->method."\" action=\"../Scripts/generationHandleRequest.php\" >";
 		}
-		else {
-			$formHtml .= "<form method=\"".$this->method."\" action=\"../Scripts/translationHandleRequest.php\" >";			
-		}
-
+		
 		foreach ($this->_inputs as $key => $input) {
 			// Skip the Database elements.
 			if ($input['inputType'] == "DATABASE") {

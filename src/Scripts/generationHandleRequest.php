@@ -169,6 +169,7 @@ $insertValues .= "\"".$nextState."\"";
 $sql = "INSERT INTO RequestHandlingMain (".$fields.") VALUES (".$insertValues.")";
 if ($conn->query($sql) === TRUE) {
 	echo "Your response has been recorded.";
+	header("Location:../Templates/dashboard.php");
 }
 else {
 	echo "Something went wrong. Please try again after sometime.";
