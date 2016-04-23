@@ -5,11 +5,11 @@ if (session_id() == "") {
 }
 
 // Get the present state name/ID, username stored in Session variables. 
+$requestID = $_POST['requestID'];
 $stateName = $_SESSION['stateName'];
 $stateID = $_SESSION['stateID'];
-
 $username = $_SESSION['user_name'];
-$usernameColumn = $_SESSION['db_user_column']; //Remove this wierd variable name.
+$usernameColumn = $_SESSION['db_user_column'];
 
 // Get the credentials to connect to Databse from config file.
 $config = include('config.php');
@@ -95,8 +95,10 @@ if (isset($_POST['submit'])) {
 	}
 }
 
+// $values has all the names and values coming from page...
+
 // Clean the dict for empty value. replace with false wherever required. and convert to string.
-$sql = "SHOW COLUMNS FROM lookup_".$stateName."translation" or die("Unable to fetch column names from response lookup table.");
+$sql = "SHOW COLUMNS FROM lookup_".$stateName."_translation" or die("Unable to fetch column names from response lookup table.");
 $result = $conn->query($sql);
 $index = 0;
 $responseLookupTableColumns = [];
@@ -112,9 +114,54 @@ while ($row = mysqli_fetch_assoc($result)) {
 	$index++;
 }
 
+// $responseLookupTableColumns contains all the names and values that are required to get response.
+
+// Add support for logical statements processing...
+
+// Calculate response from lookup table
+$index = 0;
+$sql = "SELECT * FROM lookup_".$stateName."_translation"." WHERE ";
+foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
+	if ($index == count($responseLookupTableColumns)-1) {
+		break;
+	}
+	$sql .= $responseLookupTableColumn['name']." = \"".$responseLookupTableColumn['value']."\" AND ";
+	$index++;
+}
+$sql .= $responseLookupTableColumns[$index]['name']." = \"".$responseLookupTableColumns[$index]['value']."\"";
+
+$result = $conn->query($sql);
+if ($result->num_rows == 0) {
+	die("No possible response defined for such action. Kindly fill the form properly again.");
+}	
+else{
+	while ($row = mysqli_fetch_assoc($result)) {
+		$response = $row['response'];
+	}	
+}
 
 
+// Calculate next state from lookup table
+$sql = "SELECT * FROM AutomataTransitions WHERE presentState=\"".$stateName."\" AND response=\"".$response."\"";
+$result = $conn->query($sql) or die("Unable to connect to transition table to find next state.");
+if ($result->num_rows == 0) {
+	die("No possible transition defined for such response. Kindly define the transitions of automata properly.");
+}
+else{
+	while ($row = mysqli_fetch_assoc($result)) {
+		$nextState = $row['nextState'];
+	}
+}
 
+// Update the DB....
+$sql = "UPDATE RequestHandlingMain SET presentState=\"".$nextState."\" WHERE requestID=\"".$requestID."\"";
+if($conn->query($sql) === TRUE) {
+	echo "transition successful";
+	header("Location:../Templates/dashboard.php");
+}
+else {
+	echo "Something went wrong. Please try again after sometime.";
+}
 
 
 
