@@ -3,6 +3,7 @@
 		session_start();
 	}
 ?>
+<script src="http://www.w3schools.com/lib/w3data.js"></script>
 
 <!DOCTYPE html>
 <html>
@@ -36,8 +37,7 @@
 	$result = $conn->query($sql);
 	if($result->num_rows == 1) {
 		$templateName = $stateName."_generation.php";
-		$htmlTag = "<iframe src=\"".$templateName."\"></iframe>" ;
-		echo $htmlTag;
+		include($templateName);
 	}
 	$conn->close();
 ?>
@@ -113,6 +113,43 @@
 	$conn->close();
 	$loginconn->close();
 ?>
+
+<!-- Translation Request Panel if exists-->
+<?php
+	$stateName = $_SESSION['stateName'];
+	$config = include('../Scripts/config.php');
+	$databaseHostname = $config['databaseHostname'];
+	$databaseUsername = $config['databaseUsername'];
+	$databasePassword = $config['databasePassword'];
+	$databaseName = "requestDB";
+
+	$conn = new mysqli($databaseHostname, $databaseUsername, $databasePassword, $databaseName);
+	if ($conn->connect_error) {
+		die("Connection Error:".$conn->connect_error);
+	}
+	
+	$sql = "SELECT * FROM RequestHandlingMain WHERE presentState=\"".$stateName."\"";
+	$result = $conn->query($sql);
+	if($result->num_rows > 0) {
+		echo "<div><h3>Please verify the following requests...</h3><br>";
+		while($row = mysqli_fetch_assoc($result)) {
+			echo "<div>";
+			$requestID = $row['requestID'];
+			echo $requestID."<br>";
+			echo "<form method=\"POST\" id=\"".$requestID."\" action=\"../Scripts/translationHandleRequest.php\">";
+			include $stateName.'_translation.php';
+			echo "<input type=\"hidden\" name=\"requestID\" value=\"".$requestID."\" form=\"".$requestID."\" >";
+			echo "</div>";
+		}
+		echo "</div>";
+	}
+	$conn->close();
+
+?>
+
+<script>
+w3IncludeHTML();
+</script>
 
 </body>
 </html>
