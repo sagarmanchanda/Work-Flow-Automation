@@ -97,9 +97,7 @@ if (isset($_POST['submit'])) {
 
 // $values has all the names and values coming from page...
 
-
 // Clean the dict for empty value. replace with false wherever required. and convert to string.
-
 $sql = "SHOW COLUMNS FROM lookup_".$stateName."_generation" or die("Unable to fetch column names from response lookup table.");
 $result = $conn->query($sql);
 $index = 0;
@@ -121,7 +119,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 // Add support for logical statements processing...
 
 // Calculate response from lookup table
-
 $index = 0;
 $sql = "SELECT * FROM lookup_".$stateName."_generation"." WHERE ";
 foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
@@ -134,26 +131,48 @@ foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
 $sql .= $responseLookupTableColumns[$index]['name']." = \"".$responseLookupTableColumns[$index]['value']."\"";
 
 $result = $conn->query($sql);
-while ($row = mysqli_fetch_assoc($result)) {
-	$response = $row['response'];
-}
-if (empty($row)) {
+if ($result->num_rows == 0) {
 	die("No possible response defined for such action. Kindly fill the form properly again.");
+}	
+else{
+	while ($row = mysqli_fetch_assoc($result)) {
+		$response = $row['response'];
+	}	
 }
+
 
 // Calculate next state from lookup table
 $sql = "SELECT * FROM AutomataTransitions WHERE presentState=\"".$stateName."\" AND response=\"".$response."\"";
 $result = $conn->query($sql) or die("Unable to connect to transition table to find next state.");
-while ($row = mysqli_fetch_assoc($result)) {
-	$nextState = $row['nextState'];
+if ($result->num_rows == 0) {
+	die("No possible transition defined for such response. Kindly define the transitions of automata properly.");
 }
-if (empty($row)) {
-	die("No possible transition exists for such response...");
+else{
+	while ($row = mysqli_fetch_assoc($result)) {
+		$nextState = $row['nextState'];
+	}
 }
+	
 
-// Update DB data
- 
+// Update DB data. Remember that request status is nextState.
+$fields = "RequestID, date, ";
+$timestamp = date('Y-m-d H:i:s');
+$RequestID = md5($timestamp.$username);
+$insertValues = "\"".$RequestID."\", \"".$timestamp."\", ";
+foreach ($values as $key => $value) {
+	$fields .= $value['name'].", ";
+	$insertValues .= "\"".$value['value']."\", ";
+}
+$fields .= "presentState";
+$insertValues .= "\"".$nextState."\"";
 
+$sql = "INSERT INTO RequestHandlingMain (".$fields.") VALUES (".$insertValues.")";
+if ($conn->query($sql) === TRUE) {
+	echo "Your response has been recorded.";
+}
+else {
+	echo "Something went wrong. Please try again after sometime.";
+}
 
 // Close the connections to database.
 $conn->close();
