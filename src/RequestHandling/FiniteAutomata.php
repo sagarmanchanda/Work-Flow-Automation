@@ -201,6 +201,25 @@ class FiniteAutomata
 	}
 
 	/**
+	 * In case we need to export a transition to any other part of the api.
+	 *
+	 * @param $transitionName
+	 *  Name of the transition to be exported.
+	 *
+	 * @param $presentState
+	 *  Name of the state whose transition is to be exported.
+	 */
+	public function exportTransition($transitionName,$presentState) {
+		foreach ($this->_transitions as $key => $transition) {
+			if ($transition['presentState'] == $presentState && $transition['transitionName'] == $transitionName) {
+				$export = array();
+				$export = \WFA\Utils::copyValues($transition);
+			}
+		}
+		return $export;
+	}
+
+	/**
 	 * Saves the structure of the Automata in the database for future reference by creating tables for storing
 	 * states and transitions.
 	 *
