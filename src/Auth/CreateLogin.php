@@ -26,7 +26,7 @@ class CreateLogin
 			$uri = 'http://';
 		}
 		$uri .= $_SERVER['HTTP_HOST'];
-		header('Location: '.$uri.'/team13cs243/src/Templates/redirect.php');
+		header('Location:src/Templates/redirect.php');
 		exit;
 	}
 }
