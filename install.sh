@@ -65,3 +65,25 @@ do
 	fi
 done
 
+echo "$($yellow)$($blackbg)[OK]$($nc)"
+
+# Now go for the login database
+
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+read -p "Do you want to use LDAP to configure your login database? [y/n]" confirmldap
+
+if [ "$confirmldap" = "y" ]
+then
+	echo -e "\n"
+	echo "[$($yellow)Database domain$($nc)]"
+	echo -e "$($yellow)Description$($nc): Enter the domain for your LDAP configuration. For example \"test.com\""
+	read -p "> " ldapdomain
+
+	echo -e "\n"
+	echo "[$($yellow)Database dc details$($nc)]"
+	echo -e "$($yellow)Description$($nc): Enter dc details for your LDAP configuration. For example if your domain was \"test.com\", your dc details will most probably be \"dc=test,dc=com\""
+	read -p "> " ldapdc
+
+	echo -e "$ldapdomain\n$ldapdc" > src/wfa.ldap
+fi

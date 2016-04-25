@@ -25,7 +25,7 @@ class Interface {
 	}
 
 	private static function connect() {
-		$ldapconfig = fopen("wfa.ldap", "r");
+		$ldapconfig = fopen("../wfa.ldap", "r");
 
 		$ldap = fgets($ldapconfig);
 
