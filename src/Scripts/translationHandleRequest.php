@@ -116,7 +116,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 // $responseLookupTableColumns contains all the names and values that are required to get response.
 
-// Add support for logical statements processing...
 
 // Calculate response from lookup table
 $index = 0;
@@ -130,28 +129,33 @@ foreach ($responseLookupTableColumns as $key => $responseLookupTableColumn) {
 }
 $sql .= $responseLookupTableColumns[$index]['name']." = \"".$responseLookupTableColumns[$index]['value']."\"";
 
+$response = [];
 $result = $conn->query($sql);
 if ($result->num_rows == 0) {
 	die("No possible response defined for such action. Kindly fill the form properly again.");
 }	
 else{
 	while ($row = mysqli_fetch_assoc($result)) {
-		$response = $row['response'];
+		array_push($response, $row['response']);
 	}	
 }
 
 
 // Calculate next state from lookup table
-$sql = "SELECT * FROM AutomataTransitions WHERE presentState=\"".$stateName."\" AND response=\"".$response."\"";
-$result = $conn->query($sql) or die("Unable to connect to transition table to find next state.");
-if ($result->num_rows == 0) {
-	die("No possible transition defined for such response. Kindly define the transitions of automata properly.");
-}
-else{
-	while ($row = mysqli_fetch_assoc($result)) {
-		$nextState = $row['nextState'];
+foreach ($response as $key => $responseValue) {
+	$sql = "SELECT * FROM AutomataTransitions WHERE presentState=\"".$stateName."\" AND response=\"".$responseValue."\"";
+	$result = $conn->query($sql) or die("Unable to connect to transition table to find next state.");
+	if ($result->num_rows == 0) {
+		continue;
+	}
+	else{
+		while ($row = mysqli_fetch_assoc($result)) {
+			$nextState = $row['nextState'];
+		}
+		break;
 	}
 }
+
 
 // Update the DB....
 $sql = "UPDATE RequestHandlingMain SET presentState=\"".$nextState."\", ";
