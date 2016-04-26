@@ -1,4 +1,31 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | WFA version 1.0                                                    |
+ +--------------------------------------------------------------------+
+ | Copyright 3S1J (c) 2016                                            |
+ +--------------------------------------------------------------------+
+ | This file is a part of WFA.                                        |
+ |                                                                    |
+ | Web framework for workflow automation (WFA) is free software;      |
+ | you can copy, modify, and distribute it under the terms of         |
+ | MIT License.                                                       |
+ |                                                                    |
+ | WFA is distributed in the hope that it will be useful, but         |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the MIT License in the LICENSE document for more details.      |
+ |                                                                    |
+ | You should have received a copy of the MIT License along with      |
+ | this program; if not, contact WFA at wfa.cs243[AT]gmail[DOT]com.   |
+ +--------------------------------------------------------------------+
+ */
+
+/**
+ *
+ * @package WFA
+ * @copyright 3S1J (c) 2016
+ */
 
 namespace WFA\DefineResponses;
 
@@ -7,13 +34,24 @@ namespace WFA\DefineResponses;
 */
 class DefineResponses
 {
-	
+	/**
+	 * @var string $stateName
+	 */
 	protected $stateName;
 
+	/**
+	 * @var string $stateID
+	 */
 	protected $stateID;
 
+	/**
+	 * @var string $stateType
+	 */
 	protected $stateType;
 
+	/**
+	 * @var array $validResponse
+	 */
 	protected $validResponse = [];
 
 	function __construct($stateName, $stateID, $stateType)
@@ -27,6 +65,11 @@ class DefineResponses
 		$this->stateType = $stateType;	
 	}
 
+	/**
+	 * Used to define the parameters which have to be passed to a table.
+	 *
+	 * @param $elementArray
+	 */
 	public function defineParameters($elementArray){
 		$error = $this->validateParameters($elementArray);
 		if(!empty($error)){
@@ -41,6 +84,10 @@ class DefineResponses
 
 	}
 
+	/**
+	 * @param $valueArray
+	 * @param $response
+	 */
 	public function addResponses($valueArray, $response){
 		$error = $this->validateResponses($valueArray, $response);
 		if(!empty($error)){
@@ -55,6 +102,14 @@ class DefineResponses
 		}
 	}
 
+	/**
+	 * Validate that the state was actually defined before it is used.
+	 * Validation occurs from the database, hence the use of config.php.
+	 *
+	 * @param $stateName
+	 * @param $stateID
+	 * @param $stateType
+	 */
 	protected function validateState($stateName, $stateID, $stateType) {
 		$config = include('config.php');
 		$databaseHostname = $config['databaseHostname'];
@@ -80,6 +135,9 @@ class DefineResponses
 		}
 	}
 
+	/**
+	 * @param $elementArray
+	 */
 	protected function validateParameters($elementArray){
 		$config = include('config.php');
 		$databaseHostname = $config['databaseHostname'];
@@ -119,6 +177,11 @@ class DefineResponses
 		return "";
 	}
 
+	/**
+	 * @param $elementArray
+	 *
+	 * @return string
+	 */
 	protected function createTable($elementArray){
 		$tableName = "lookup_".$this->stateName."_".$this->stateType;
 		$config = include('config.php');
@@ -150,6 +213,12 @@ class DefineResponses
 
 	}
 
+	/**
+	 * @param $valueArray
+	 * @param $response
+	 *
+	 * @return string
+	 */
 	protected function validateResponses($valueArray, $response){
 		$tableName = "lookup_".$this->stateName."_".$this->stateType;
 		$config = include('config.php');
@@ -202,6 +271,12 @@ class DefineResponses
 		return "";
 	}
 
+	/**
+	 * @param $valueArray
+	 * @param $response
+	 *
+	 * @return string
+	 */
 	protected function insertResponses($valueArray, $response){
 		$tableName = "lookup_".$this->stateName."_".$this->stateType;
 		$config = include('config.php');

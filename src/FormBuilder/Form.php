@@ -1,4 +1,31 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | WFA version 1.0                                                    |
+ +--------------------------------------------------------------------+
+ | Copyright 3S1J (c) 2016                                            |
+ +--------------------------------------------------------------------+
+ | This file is a part of WFA.                                        |
+ |                                                                    |
+ | Web framework for workflow automation (WFA) is free software;      |
+ | you can copy, modify, and distribute it under the terms of         |
+ | MIT License.                                                       |
+ |                                                                    |
+ | WFA is distributed in the hope that it will be useful, but         |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the MIT License in the LICENSE document for more details.      |
+ |                                                                    |
+ | You should have received a copy of the MIT License along with      |
+ | this program; if not, contact WFA at wfa.cs243[AT]gmail[DOT]com.   |
+ +--------------------------------------------------------------------+
+ */
+
+/**
+ *
+ * @package WFA
+ * @copyright 3S1J (c) 2016
+ */
 
 namespace WFA\FormBuilder;
 
@@ -242,9 +269,9 @@ class Form
 	}
 
 	/**
-	 * Creates html equivalent/template of the form described for a particular state. This function should be called at the end
-	 * once all the form entries are decided. The template is created in the Templates folder under src.
-	 *
+	 * Creates html equivalent/template of the form described for a particular state. This function
+	 * should be called at the end once all the form entries are decided.
+	 * The template is created in the Templates folder under src.
 	 */
 	public function buildFormTemplate() {
 		$formTemplatepath = "src/Templates/".$this->stateName."_".$this->stateType.".php";
@@ -290,12 +317,13 @@ class Form
 
 	
 	/**
-	 * function called to create a table which stores the contents of $_inputs array for a particular state in the requestDB
-	 * database in the table which is names after the state. This table would be later used for the pupose of deciding response
-	 * for a particular input from page and then further deciding the transition.
+	 * function called to create a table which stores the contents of $_inputs array for
+	 * a particular state in the requestDB database in the table which is named after the state.
+	 * This table would be later used for the pupose of deciding response for a particular input
+	 * from page and then further deciding the transition.
 	 *	
 	 * @param $databaseName
-	 * 	Alwways use the default set value of the parameter, i.e. "RequestDB".
+	 * 	(For now) use the default set value of the parameter, i.e. "requestDB".
 	 */
 	public function buildFormInputFieldTable($databaseName = "requestDB") {
 		// take credentials from config.php and connect to database.
@@ -351,7 +379,7 @@ class Form
 	}
 
 	/**
-	 * Last function called for finally outputting the form.]
+	 * Last function called for finally outputting the form.
 	 * 
 	 * @deprecated
 	 */
