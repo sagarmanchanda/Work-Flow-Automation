@@ -7,26 +7,19 @@
 
 API for workflow automation. Currently restricted to IIT Guwahati campus, however can be extended to any work-place by hacking into the authentication and formbuilder tools.
 
+Every updated detail is available in the [Wiki](https://gitlab.com/3S1J/team13cs243/wikis/home)
+
 # Install
 
-Installation recommended via Composer.
-
-To install Composer:
-
-``` bash
-$ export HTTP_PROXY=[http proxy]
-$ curl -sS https://getcomposer.org/installer | php
-$ mv composer.phar /usr/local/bin/composer
+To install, download the WFA package from GitLab and run ```install.sh```:
+```bash
+$ . install.sh
 ```
 
-``` Note: If the the above fails due to permissions, run the mv line again with sudo. ```
-
-Now open the project directory and run:
-
-``` bash
-$ composer install
+Note: if it does not work, try the following and re-run:
+```bash
+$ sudo chmod a+x install.sh
 ```
-On successfull installation, a *vendors* folder will be generated.
 
 # Usage
 
