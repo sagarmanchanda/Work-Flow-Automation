@@ -14,3 +14,6 @@ phpDocumentor can be used to generate automatic documentation of the software us
 
 ### PHPUnit (For Developers):
 PHPUnit is used for unit testing and also used with Jenkins for Continuous Integration.
+
+## Bootstrap:
+Bootstrap is used for beautification of the instances.
