@@ -209,7 +209,7 @@ class FiniteAutomata
 	 * @param $presentState
 	 *  Name of the state whose transition is to be exported.
 	 */
-	public function exportTransition($transitionName,$presentState) {
+	public function exportTransition($transitionName, $presentState) {
 		foreach ($this->_transitions as $key => $transition) {
 			if ($transition['presentState'] == $presentState && $transition['transitionName'] == $transitionName) {
 				$export = array();

@@ -26,8 +26,8 @@ class FiniteAutomataTest extends PHPUnit_Framework_TestCase {
 		$DFA->addState('test02','008','translation');
 		$DFA->addTransition('test_transit','test01','test02','success');
 
-		$export = $DFA->exportTransition('test_transit')
-		$expectedOutput = array(
+		$export = $DFA->exportTransition('test_transit', 'test01');
+		$expectedOutput = array (
 			'transitionName' => 'test_transit',
 			'presentState' => 'test01',
 			'nextState' => 'test02',

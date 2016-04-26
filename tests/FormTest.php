@@ -2,7 +2,7 @@
 
 class FormTest extends PHPUnit_Framework_TestCase {
 	public function testExportInput() {
-		$form = new WFA\FormBuilder\Form();
+		$form = new WFA\FormBuilder\Form("dummy", "dummy", "dummy");
 
 		$form->addElement('text', 'webmail', 'E-mail');
 		$form->addRule('webmail', 'required');
