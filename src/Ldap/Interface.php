@@ -7,6 +7,16 @@ namespace WFA\Ldap;
  */
 
 class Interface {
+
+	/**
+	 * Function used to authenticate user against his/her Ldap account.
+	 *
+	 * @param $username
+	 * @param $password
+	 *
+	 * @return bool
+	 *  Whether Ldap login succeeded or not.
+	 */
 	public static function authenticate($username, $password) {
 		$ds = self::connect();
 		$dc = self::getDc();

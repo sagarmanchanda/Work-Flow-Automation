@@ -3,11 +3,17 @@
 namespace WFA\Auth;
 
 /**
-* 
+* This class is responsible for construction of a basic login page.
+* Login details are obtained from config.php
 */
 class CreateLogin
 {
-	
+	/**
+	 * @param $table_name
+	 * @param $db_name
+	 * @param $user_column
+	 * @param $pass_column
+	 */	
 	function __construct($table_name, $db_name, $user_column, $pass_column)
 	{
 		session_start();
